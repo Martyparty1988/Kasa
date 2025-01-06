@@ -27,7 +27,9 @@ function renderInventory() {
         const itemEl = document.createElement('div');
         itemEl.className = `item ${currentVilla}`;
         itemEl.innerHTML = `
-            <i class="fas ${item.icon}"></i>
+            <div class="item-image">
+                <img src="${item.image}" alt="${item.name}">
+            </div>
             <div class="item-name">${item.name}</div>
             <div class="item-price">${item.customPrice ? 'Vlastní cena' : `${item.price} ${item.currency}`}</div>
         `;
