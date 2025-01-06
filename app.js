@@ -29,11 +29,29 @@ function renderInventory() {
         itemEl.innerHTML = `
             <i class="fas ${item.icon}"></i>
             <div class="item-name">${item.name}</div>
-            <div class="item-price">${item.price} ${item.currency}</div>
+            <div class="item-price">${item.customPrice ? 'Vlastní cena' : `${item.price} ${item.currency}`}</div>
         `;
-        itemEl.onclick = () => showQuantitySelector(item);
+        itemEl.onclick = () => handleItemClick(item);
         inventoryEl.appendChild(itemEl);
     });
+}
+
+function handleItemClick(item) {
+    if (item.name === 'Wellness') {
+        const price = prompt('Zadejte cenu wellness v EUR:');
+        if (price === null || isNaN(price)) return;
+        
+        cart.push({
+            ...item,
+            id: Date.now(),
+            price: parseFloat(price),
+            quantity: 1
+        });
+        renderCart();
+        updateStats();
+    } else {
+        showQuantitySelector(item);
+    }
 }
 
 // Správa množství
@@ -59,15 +77,6 @@ function adjustQuantity(delta) {
 }
 
 function confirmQuantity() {
-    if (selectedItem.customPrice) {
-        const price = prompt('Zadejte cenu:');
-        if (price === null || isNaN(price)) {
-            hideQuantitySelector();
-            return;
-        }
-        selectedItem = {...selectedItem, price: parseFloat(price)};
-    }
-    
     const newItems = Array(currentQuantity).fill().map((_, i) => ({
         ...selectedItem,
         id: Date.now() + i,
@@ -137,13 +146,17 @@ function updateExchangeRate() {
 }
 
 function calculateTotal(currency) {
-    let total = 0;
-    let discount = document.getElementById('discount').checked;
+    let itemsTotal = 0;
+    let cityTaxTotal = 0;
+    const discount = document.getElementById('discount').checked;
     const guests = parseInt(document.getElementById('guests').value) || 0;
     const nights = parseInt(document.getElementById('nights').value) || 0;
 
     // City Tax výpočet (2 EUR za osobu na noc)
     const cityTax = guests * nights * 2;
+    
+    // Převod City Tax do požadované měny
+    cityTaxTotal = currency === 'CZK' ? cityTax * EXCHANGE_RATE : cityTax;
 
     // Součet položek
     cart.forEach(item => {
@@ -153,18 +166,14 @@ function calculateTotal(currency) {
                 ? itemValue * EXCHANGE_RATE 
                 : itemValue / EXCHANGE_RATE;
         }
-        total += itemValue;
+        itemsTotal += itemValue;
     });
 
-    // Přidání City Tax
-    if (currency === 'CZK') {
-        total += cityTax * EXCHANGE_RATE;
-    } else {
-        total += cityTax;
-    }
+    // Výpočet slevy pouze z položek (bez City Tax)
+    const discountAmount = discount ? (itemsTotal * 0.1) : 0;
+    const total = itemsTotal + cityTaxTotal;
 
-    const discountAmount = discount ? (total * 0.1) : 0;
-    return { total, discountAmount };
+    return { total, discountAmount, itemsTotal, cityTaxTotal };
 }
 
 function updateStats() {
@@ -188,7 +197,7 @@ function generateInvoice() {
         return;
     }
 
-    const { total, discountAmount } = calculateTotal(currency);
+    const { total, discountAmount, itemsTotal, cityTaxTotal } = calculateTotal(currency);
     const paymentMethods = {
         cash: 'Hotově',
         card: 'Kartou',
@@ -227,16 +236,20 @@ function generateInvoice() {
                     <span>${(item.price * item.quantity).toFixed(2)} ${item.currency}</span>
                 </div>
             `).join('')}
-            <div class="cart-item">
-                <span>City Tax (${guests} hostů × ${nights} nocí)</span>
-                <span>${guests * nights * 2} EUR</span>
+            <div class="cart-item subtotal">
+                <span>Mezisoučet položek</span>
+                <span>${itemsTotal.toFixed(2)} ${currency}</span>
             </div>
             ${discount ? `
                 <div class="cart-item discount">
-                    <span>Sleva 10%</span>
+                    <span>Sleva 10% (z položek)</span>
                     <span>-${discountAmount.toFixed(2)} ${currency}</span>
                 </div>
             ` : ''}
+            <div class="cart-item">
+                <span>City Tax (${guests} hostů × ${nights} nocí)</span>
+                <span>${cityTaxTotal.toFixed(2)} ${currency}</span>
+            </div>
         </div>
         <div class="total">
             Celkem: ${(total - discountAmount).toFixed(2)} ${currency}
