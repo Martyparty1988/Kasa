@@ -391,6 +391,13 @@ select {
     font-weight: 600;
 }
 
+.subtotal {
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+    padding-top: 10px;
+    font-weight: 600;
+}
+
 .total {
     font-size: 1.3em;
     font-weight: 700;
