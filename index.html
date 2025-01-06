@@ -5,708 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Villa POS</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --oh-yeah-color: #FF6B6B;
-            --oh-yeah-gradient: linear-gradient(135deg, #FF6B6B, #FF8E8E);
-            --amazing-pool-color: #4ECDC4;
-            --amazing-pool-gradient: linear-gradient(135deg, #4ECDC4, #45B7AF);
-            --little-castle-color: #96CEB4;
-            --little-castle-gradient: linear-gradient(135deg, #96CEB4, #7FB59D);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            padding: 20px;
-            padding-bottom: 100px;
-            max-width: 600px;
-            margin: 0 auto;
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-
-        .villa-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .villa-btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 15px;
-            font-weight: 600;
-            white-space: nowrap;
-            background: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            font-size: 16px;
-        }
-
-        .villa-btn.active {
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .oh-yeah.active { background: var(--oh-yeah-gradient); }
-        .amazing-pool.active { background: var(--amazing-pool-gradient); }
-        .little-castle.active { background: var(--little-castle-gradient); }
-
-        .inventory {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .item {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .item:active {
-            transform: scale(0.97);
-        }
-
-        .item i {
-            font-size: 28px;
-            margin-bottom: 8px;
-            color: var(--oh-yeah-color);
-        }
-
-        .item.amazing-pool i { color: var(--amazing-pool-color); }
-        .item.little-castle i { color: var(--little-castle-color); }
-
-        .item-name {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .item-price {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .quantity-selector {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 20px;
-            border-radius: 25px 25px 0 0;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
-            display: none;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .quantity-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
-            border: none;
-            background: #f8f9fa;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .quantity-btn:active {
-            transform: scale(0.95);
-        }
-
-        .quantity-display {
-            font-size: 24px;
-            font-weight: 600;
-            min-width: 60px;
-            text-align: center;
-        }
-
-        .add-to-cart-btn {
-            background: #2ecc71;
-            color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            width: 100%;
-            font-weight: 600;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        .cart {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.1);
-            border-radius: 25px 25px 0 0;
-        }
-
-        .cart-items {
-            margin-bottom: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .cart-item-quantity {
-            background: #f8f9fa;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.9em;
-            margin-right: 10px;
-        }
-
-        .cart-item-remove {
-            background: none;
-            border: none;
-            color: #ff6b6b;
-            padding: 5px;
-        }
-
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .control-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        input[type="number"], select {
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 12px;
-            width: 100%;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        input[type="number"]:focus, select:focus {
-            border-color: #2ecc71;
-            outline: none;
-        }
-
-        .currency-switch {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .exchange-rate-btn {
-            background: none;
-            border: none;
-            padding: 8px;
-            color: #666;
-            transition: color 0.3s ease;
-        }
-
-        .exchange-rate-btn:hover {
-            color: #2ecc71;
-        }
-
-        .discount-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
-
-        .discount-toggle input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
-
-        .generate-btn {
-            background: #2ecc71;
-            color: white;
-            padding: 18px;
-            border: none;
-            border-radius: 15px;
-            width: 100%;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .generate-btn:active {
-            transform: scale(0.98);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .invoice-header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .invoice-items {
-            margin-bottom: 25px;
-        }
-
-        .discount {
-            color: #e74c3c;
-            font-weight: 600;
-        }
-
-        .total {
-            font-size: 1.3em;
-            font-weight: 700;
-            text-align: right;
-            padding: 15px 0;
-            border-top: 2px solid #eee;
-            margin-top: 15px;
-        }
-
-        .payment-method {
-            margin-top: 15px;
-            text-align: right;
-            color: #666;
-            font-style: italic;
-        }
-
-        .stats-bar {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #2ecc71;
-        }
-
-        .stat-label {
-            font-size: 0.8em;
-            color: #666;
-        }
-    </style>
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-    <div class="villa-selector">
-        <button class="villa-btn oh-yeah" onclick="selectVilla('oh-yeah')">OH YEAH</button>
-        <button class="villa-btn amazing-pool" onclick="selectVilla('amazing-pool')">Amazing Pool</button>
-        <button class="villa-btn little-castle" onclick="selectVilla('little-castle')">Little Castle</button>
-    </div>
-
-    <div class="stats-bar">
-        <div class="stat">
-            <div class="stat-value" id="totalItems">0</div>
-            <div class="stat-label">Položky</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value" id="totalAmount">0 Kč</div>
-            <div class="stat-label">Celkem</div>
-        </div>
-    </div>
-
-    <div class="inventory" id="inventory"></div>
-
-    <div class="quantity-selector" id="quantitySelector">
-        <div id="selectedItemName" class="item-name"></div>
-        <div id="selectedItemPrice" class="item-price"></div>
-        <div class="quantity-controls">
-            <button class="quantity-btn" onclick="adjustQuantity(-1)">-</button>
-            <div class="quantity-display" id="quantityDisplay">1</div>
-            <button class="quantity-btn" onclick="adjustQuantity(1)">+</button>
-        </div>
-        <button class="add-to-cart-btn" onclick="confirmQuantity()">Přidat do košíku</button>
-    </div>
-
-    <div class="cart">
-        <div class="cart-items" id="cartItems"></div>
-        <div class="controls">
-            <div class="control-group">
-                <input type="number" id="guests" placeholder="Počet hostů" min="1">
-                <input type="number" id="nights" placeholder="Počet nocí" min="1">
+    <div class="app-container">
+        <nav class="villa-nav">
+            <div class="tab-scroll">
+                <button class="villa-btn oh-yeah" onclick="selectVilla('oh-yeah')">
+                    <i class="fas fa-house"></i>
+                    <span>OH YEAH</span>
+                </button>
+                <button class="villa-btn amazing-pool" onclick="selectVilla('amazing-pool')">
+                    <i class="fas fa-water-ladder"></i>
+                    <span>Amazing Pool</span>
+                </button>
+                <button class="villa-btn little-castle" onclick="selectVilla('little-castle')">
+                    <i class="fas fa-castle"></i>
+                    <span>Little Castle</span>
+                </button>
             </div>
-            <div class="control-group">
-                <select id="currency">
-                    <option value="CZK">CZK</option>
-                    <option value="EUR">EUR</option>
-                </select>
-                <div class="currency-switch">
+        </nav>
+
+        <main class="main-content">
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="totalItems">0</div>
+                    <div class="stat-label">Položky</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalAmount">0 Kč</div>
+                    <div class="stat-label">Celkem</div>
+                </div>
+            </div>
+
+            <div class="inventory" id="inventory"></div>
+        </main>
+
+        <div id="quantitySelector" class="quantity-selector">
+            <div class="quantity-header">
+                <div id="selectedItemName" class="item-name"></div>
+                <div id="selectedItemPrice" class="item-price"></div>
+            </div>
+            <div class="quantity-controls">
+                <button class="quantity-btn" onclick="adjustQuantity(-1)">-</button>
+                <div class="quantity-display" id="quantityDisplay">1</div>
+                <button class="quantity-btn" onclick="adjustQuantity(1)">+</button>
+            </div>
+            <div class="quantity-actions">
+                <button class="cancel-btn" onclick="hideQuantitySelector()">Zrušit</button>
+                <button class="confirm-btn" onclick="confirmQuantity()">Přidat do košíku</button>
+            </div>
+        </div>
+
+        <footer class="cart-footer">
+            <button class="cart-toggle" onclick="toggleCart()">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cartCount">0</span>
+            </button>
+        </footer>
+
+        <div id="cartPanel" class="cart-panel">
+            <div class="cart-header">
+                <h2>Košík</h2>
+                <button class="close-btn" onclick="toggleCart()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-controls">
+                <div class="control-group">
+                    <input type="number" id="guests" placeholder="Počet hostů" min="1">
+                    <input type="number" id="nights" placeholder="Počet nocí" min="1">
+                </div>
+                <div class="control-group">
+                    <select id="currency" onchange="updateStats()">
+                        <option value="CZK">CZK</option>
+                        <option value="EUR">EUR</option>
+                    </select>
                     <button class="exchange-rate-btn" onclick="updateExchangeRate()">
                         <i class="fas fa-sync-alt"></i>
                     </button>
+                    <select id="paymentMethod">
+                        <option value="cash">Hotově</option>
+                        <option value="card">Kartou</option>
+                        <option value="unpaid">Neplaceno</option>
+                    </select>
                 </div>
-                <select id="paymentMethod">
-                    <option value="cash">Hotově</option>
-                    <option value="card">Kartou</option>
-                    <option value="unpaid">Neplaceno</option>
-                </select>
+                <label class="discount-toggle">
+                    <input type="checkbox" id="discount" onchange="updateStats()">
+                    <span>10% sleva</span>
+                </label>
+                <button class="generate-btn" onclick="generateInvoice()">
+                    Generovat fakturu
+                </button>
             </div>
         </div>
-        <div class="discount-toggle">
-            <input type="checkbox" id="discount">
-            <label for="discount">10% sleva</label>
-        </div>
-        <button class="generate-btn" onclick="generateInvoice()">Generovat fakturu</button>
     </div>
 
     <div class="modal" id="invoiceModal">
         <div class="modal-content" id="invoiceContent"></div>
     </div>
 
-    <script>
-        let EXCHANGE_RATE = 25.5;
-        let currentVilla = null;
-        let cart = [];
-        let selectedItem = null;
-        let currentQuantity = 1;
-
-        const inventory = {
-            'oh-yeah': [
-                { name: 'Budvar', price: 59, currency: 'CZK', icon: 'fa-beer' },
-                { name: 'Malibu', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Jack s colou', price: 99, currency: 'CZK', icon: 'fa-glass-whiskey' },
-                { name: 'Moscow Mule', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Gin-Tonic', price: 99, currency: 'CZK', icon: 'fa-wine-glass' },
-                { name: 'Mojito', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Prosecco', price: 390, currency: 'CZK', icon: 'fa-champagne-glasses' },
-                { name: 'Pivo sud 30l', price: 125, currency: 'EUR', icon: 'fa-beer-mug-empty' },
-                { name: 'Pivo sud 50l', price: 175, currency: 'EUR', icon: 'fa-beer-mug-empty' },
-                { name: 'Plyn', price: 12, currency: 'EUR', icon: 'fa-fire' },
-                { name: 'Gril', price: 20, currency: 'EUR', icon: 'fa-fire-burner' },
-                { name: 'Wellness', price: 0, currency: 'EUR', icon: 'fa-spa', customPrice: true }
-            ],
-            'amazing-pool': [
-                { name: 'Budvar', price: 59, currency: 'CZK', icon: 'fa-beer' },
-                { name: 'Malibu', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Jack s colou', price: 99, currency: 'CZK', icon: 'fa-glass-whiskey' },
-                { name: 'Moscow Mule', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Gin-Tonic', price: 99, currency: 'CZK', icon: 'fa-wine-glass' },
-                { name: 'Mojito', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Coca-Cola', price: 32, currency: 'CZK', icon: 'fa-bottle-water' },
-                { name: 'Sprite', price: 32, currency: 'CZK', icon: 'fa-bottle-water' },
-                { name: 'Red Bull', price: 59, currency: 'CZK', icon: 'fa-bolt' },
-                { name: 'Prosecco', price: 390, currency: 'CZK', icon: 'fa-champagne-glasses' },
-                { name: 'Pivo sud 30l', price: 125, currency: 'EUR', icon: 'fa-beer-mug-empty' },
-                { name: 'Pivo sud 50l', price: 175, currency: 'EUR', icon: 'fa-beer-mug-empty' },
-                { name: 'Plyn', price: 12, currency: 'EUR', icon: 'fa-fire' },
-                { name: 'Gril', price: 20, currency: 'EUR', icon: 'fa-fire-burner' },
-                { name: 'Wellness', price: 0, currency: 'EUR', icon: 'fa-spa', customPrice: true }
-            ],
-            'little-castle': [
-                { name: 'Budvar', price: 59, currency: 'CZK', icon: 'fa-beer' },
-                { name: 'Malibu', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Jack s colou', price: 99, currency: 'CZK', icon: 'fa-glass-whiskey' },
-                { name: 'Moscow Mule', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Gin-Tonic', price: 99, currency: 'CZK', icon: 'fa-wine-glass' },
-                { name: 'Mojito', price: 99, currency: 'CZK', icon: 'fa-cocktail' },
-                { name: 'Prosecco', price: 390, currency: 'CZK', icon: 'fa-champagne-glasses' },
-                { name: 'Pivo sud 30l', price: 125, currency: 'EUR', icon: 'fa-beer-mug-empty' },
-                { name: 'Pivo sud 50l', price: 175, currency: 'EUR', icon: 'fa-beer-mug-empty' },
-                { name: 'Plyn', price: 12, currency: 'EUR', icon: 'fa-fire' },
-                { name: 'Gril', price: 20, currency: 'EUR', icon: 'fa-fire-burner' },
-                { name: 'Wellness', price: 0, currency: 'EUR', icon: 'fa-spa', customPrice: true }
-            ]
-        };
-
-        function selectVilla(villa) {
-            currentVilla = villa;
-            document.querySelectorAll('.villa-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.${villa}`).classList.add('active');
-            renderInventory();
-        }
-
-        function renderInventory() {
-            const inventoryEl = document.getElementById('inventory');
-            inventoryEl.innerHTML = '';
-            
-            inventory[currentVilla].forEach(item => {
-                const itemEl = document.createElement('div');
-                itemEl.className = `item ${currentVilla}`;
-                itemEl.innerHTML = `
-                    <i class="fas ${item.icon}"></i>
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-price">${item.price} ${item.currency}</div>
-                `;
-                itemEl.onclick = () => showQuantitySelector(item);
-                inventoryEl.appendChild(itemEl);
-            });
-        }
-
-        function showQuantitySelector(item) {
-            selectedItem = item;
-            currentQuantity = 1;
-            const selector = document.getElementById('quantitySelector');
-            document.getElementById('selectedItemName').textContent = item.name;
-            document.getElementById('selectedItemPrice').textContent = `${item.price} ${item.currency}`;
-            document.getElementById('quantityDisplay').textContent = currentQuantity;
-            selector.style.display = 'block';
-        }
-
-        function adjustQuantity(delta) {
-            currentQuantity = Math.max(1, currentQuantity + delta);
-            document.getElementById('quantityDisplay').textContent = currentQuantity;
-        }
-
-        function confirmQuantity() {
-            if (selectedItem.customPrice) {
-                const price = prompt('Zadejte cenu:');
-                if (price === null) return;
-                selectedItem = {...selectedItem, price: parseFloat(price)};
-            }
-            
-            for (let i = 0; i < currentQuantity; i++) {
-                cart.push({...selectedItem, id: Date.now() + i});
-            }
-            
-            document.getElementById('quantitySelector').style.display = 'none';
-            renderCart();
-            updateStats();
-        }
-
-        function removeFromCart(id) {
-            cart = cart.filter(item => item.id !== id);
-            renderCart();
-            updateStats();
-        }
-
-        function updateStats() {
-            const totalItems = cart.length;
-            document.getElementById('totalItems').textContent = totalItems;
-            
-            const currency = document.getElementById('currency').value;
-            const { total } = calculateTotal(currency);
-            document.getElementById('totalAmount').textContent = `${total.toFixed(2)} ${currency}`;
-        }
-
-        function renderCart() {
-            const cartEl = document.getElementById('cartItems');
-            cartEl.innerHTML = '';
-            
-            const groupedItems = cart.reduce((acc, item) => {
-                const key = `${item.name}-${item.price}-${item.currency}`;
-                if (!acc[key]) {
-                    acc[key] = { ...item, quantity: 1 };
-                } else {
-                    acc[key].quantity++;
-                }
-                return acc;
-            }, {});
-            
-            Object.values(groupedItems).forEach(item => {
-                const itemEl = document.createElement('div');
-                itemEl.className = 'cart-item';
-                itemEl.innerHTML = `
-                    <div>
-                        <span class="cart-item-quantity">×${item.quantity}</span>
-                        ${item.name}
-                    </div>
-                    <div>
-                        ${(item.price * item.quantity).toFixed(2)} ${item.currency}
-                        <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                `;
-                cartEl.appendChild(itemEl);
-            });
-        }
-
-        function updateExchangeRate() {
-            const rate = prompt('Zadejte aktuální kurz EUR/CZK:', EXCHANGE_RATE);
-            if (rate && !isNaN(rate)) {
-                EXCHANGE_RATE = parseFloat(rate);
-                updateStats();
-            }
-        }
-
-        function calculateTotal(currency) {
-            let total = 0;
-            let discount = document.getElementById('discount').checked;
-            const guests = parseInt(document.getElementById('guests').value) || 0;
-            const nights = parseInt(document.getElementById('nights').value) || 0;
-
-            // City Tax výpočet
-            const cityTax = guests * nights * 2; // 2 EUR za noc a hosta
-
-            cart.forEach(item => {
-                let itemValue = item.price;
-                if (item.currency !== currency) {
-                    itemValue = item.currency === 'EUR' 
-                        ? itemValue * EXCHANGE_RATE 
-                        : itemValue / EXCHANGE_RATE;
-                }
-                total += itemValue;
-            });
-
-            if (currency === 'CZK') {
-                total += cityTax * EXCHANGE_RATE;
-            } else {
-                total += cityTax;
-            }
-
-            const discountAmount = discount ? (total * 0.1) : 0;
-            return { total, discountAmount };
-        }
-
-        function generateInvoice() {
-            const currency = document.getElementById('currency').value;
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const guests = document.getElementById('guests').value;
-            const nights = document.getElementById('nights').value;
-            const discount = document.getElementById('discount').checked;
-
-            if (!guests || !nights) {
-                alert('Zadejte počet hostů a nocí');
-                return;
-            }
-
-            const { total, discountAmount } = calculateTotal(currency);
-            const paymentMethods = {
-                cash: 'Hotově',
-                card: 'Kartou',
-                unpaid: 'Neplaceno'
-            };
-
-            const villaColors = {
-                'oh-yeah': 'var(--oh-yeah-color)',
-                'amazing-pool': 'var(--amazing-pool-color)',
-                'little-castle': 'var(--little-castle-color)'
-            };
-
-            const modal = document.getElementById('invoiceModal');
-            const content = document.getElementById('invoiceContent');
-            
-            // Group items for invoice
-            const groupedItems = cart.reduce((acc, item) => {
-                const key = `${item.name}-${item.price}-${item.currency}`;
-                if (!acc[key]) {
-                    acc[key] = { ...item, quantity: 1 };
-                } else {
-                    acc[key].quantity++;
-                }
-                return acc;
-            }, {});
-
-            content.innerHTML = `
-                <div class="invoice-header" style="color: ${villaColors[currentVilla]}">
-                    <h2>${document.querySelector('.villa-btn.active').textContent}</h2>
-                    <p>${new Date().toLocaleDateString()}</p>
-                </div>
-                <div class="invoice-items">
-                    ${Object.values(groupedItems).map(item => `
-                        <div class="cart-item">
-                            <span>${item.name} (×${item.quantity})</span>
-                            <span>${(item.price * item.quantity).toFixed(2)} ${item.currency}</span>
-                        </div>
-                    `).join('')}
-                    <div class="cart-item">
-                        <span>City Tax (${guests} hostů × ${nights} nocí)</span>
-                        <span>${guests * nights * 2} EUR</span>
-                    </div>
-                    ${discount ? `
-                        <div class="cart-item discount">
-                            <span>Sleva 10%</span>
-                            <span>-${discountAmount.toFixed(2)} ${currency}</span>
-                        </div>
-                    ` : ''}
-                </div>
-                <div class="total">
-                    Celkem: ${(total - discountAmount).toFixed(2)} ${currency}
-                </div>
-                <div class="payment-method">
-                    Způsob platby: ${paymentMethods[paymentMethod]}
-                </div>
-            `;
-            
-            modal.style.display = 'flex';
-            modal.onclick = (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            };
-        }
-
-        // Inicializace první vily
-        selectVilla('oh-yeah');
-    </script>
+    <script src="inventory.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
