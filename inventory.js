@@ -14,7 +14,8 @@ const inventory = {
         { name: 'Pivo sud 50l', price: 175, currency: 'EUR', image: 'images/pivo50.png' },
         { name: 'Plyn', price: 12, currency: 'EUR', image: 'images/Plyn.png' },
         { name: 'Gril', price: 20, currency: 'EUR', image: 'images/grill.png' },
-        { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', customPrice: true }
+        { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', customPrice: true },
+        { name: 'Fanta', price: 32, currency: 'CZK', image: 'images/fanta.png' }
     ],
     'amazing-pool': [
         { name: 'Budvar', price: 59, currency: 'CZK', image: 'images/budvar.png' },
@@ -31,7 +32,8 @@ const inventory = {
         { name: 'Pivo sud 50l', price: 175, currency: 'EUR', image: 'images/pivo50.png' },
         { name: 'Plyn', price: 12, currency: 'EUR', image: 'images/Plyn.png' },
         { name: 'Gril', price: 20, currency: 'EUR', image: 'images/grill.png' },
-        { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', customPrice: true }
+        { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', customPrice: true },
+        { name: 'Fanta', price: 32, currency: 'CZK', image: 'images/fanta.png' }
     ],
     'little-castle': [
         { name: 'Budvar', price: 59, currency: 'CZK', image: 'images/budvar.png' },
@@ -48,5 +50,7 @@ const inventory = {
         { name: 'Pivo sud 50l', price: 175, currency: 'EUR', image: 'images/pivo50.png' },
         { name: 'Plyn', price: 12, currency: 'EUR', image: 'images/Plyn.png' },
         { name: 'Gril', price: 20, currency: 'EUR', image: 'images/grill.png' },
-        { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', customPrice: true }
-    ],
+        { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', customPrice: true },
+        { name: 'Fanta', price: 32, currency: 'CZK', image: 'images/fanta.png' }
+    ]
+};
