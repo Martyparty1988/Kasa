@@ -33,3 +33,27 @@ const inventory = {
     'amazing-pool': [...inventoryItems],
     'little-castle': [...inventoryItems]
 };
+
+function renderInventory(category = 'all') {
+    const inventoryEl = document.getElementById('inventory');
+    inventoryEl.innerHTML = '';
+    
+    const filteredItems = category === 'all' 
+        ? inventory[currentVilla] 
+        : inventory[currentVilla].filter(item => {
+            // Příklad kategorií podle názvu nebo vlastnosti
+            if (category === 'drinks') return ['Coca-Cola', 'Sprite', 'Fanta', 'Red Bull'].includes(item.name);
+            if (category === 'alcohol') return item.name.includes('Malibu') || item.name.includes('Gin');
+            return false;
+        });
+
+    filteredItems.forEach(item => {
+        // Stejný kód jako v původní funkci renderInventory
+    });
+}
+// HTML pro filtry
+<div class="filters">
+    <button onclick="renderInventory('all')">Vše</button>
+    <button onclick="renderInventory('drinks')">Nápoje</button>
+    <button onclick="renderInventory('alcohol')">Alkohol</button>
+</div>
