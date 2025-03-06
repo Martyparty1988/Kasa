@@ -1,31 +1,31 @@
 const inventoryItems = [
     // 1. Nealkoholické nápoje
-    { name: 'Coca-Cola', price: 32, currency: 'CZK', image: 'images/cola.png' },
-    { name: 'Sprite', price: 32, currency: 'CZK', image: 'images/sprite.png' },
-    { name: 'Fanta', price: 32, currency: 'CZK', image: 'images/fanta.png' },
+    { name: 'Coca-Cola', price: 32, currency: 'CZK', image: 'images/cola.png', category: 'non-alcoholic' },
+    { name: 'Sprite', price: 32, currency: 'CZK', image: 'images/sprite.png', category: 'non-alcoholic' },
+    { name: 'Fanta', price: 32, currency: 'CZK', image: 'images/fanta.png', category: 'non-alcoholic' },
     
     // 2. Alkoholické míchané drinky
-    { name: 'Malibu', price: 99, currency: 'CZK', image: 'images/malibu.png' },
-    { name: 'Jack s colou', price: 99, currency: 'CZK', image: 'images/jack.png' },
-    { name: 'Moscow Mule', price: 99, currency: 'CZK', image: 'images/moscow.png' },
-    { name: 'Gin-Tonic', price: 99, currency: 'CZK', image: 'images/gin.png' },
-    { name: 'Mojito', price: 99, currency: 'CZK', image: 'images/mojito.png' },
+    { name: 'Malibu', price: 99, currency: 'CZK', image: 'images/malibu.png', category: 'alcoholic' },
+    { name: 'Jack s colou', price: 99, currency: 'CZK', image: 'images/jack.png', category: 'alcoholic' },
+    { name: 'Moscow Mule', price: 99, currency: 'CZK', image: 'images/moscow.png', category: 'alcoholic' },
+    { name: 'Gin-Tonic', price: 99, currency: 'CZK', image: 'images/gin.png', category: 'alcoholic' },
+    { name: 'Mojito', price: 99, currency: 'CZK', image: 'images/mojito.png', category: 'alcoholic' },
     
-    // 3. Plechovkové nápoje
-    { name: 'Red Bull', price: 59, currency: 'CZK', image: 'images/redbull.png' },
-    { name: 'Budvar', price: 59, currency: 'CZK', image: 'images/budvar.png' },
+    // 3. Plechovkové nápoje (piva)
+    { name: 'Red Bull', price: 59, currency: 'CZK', image: 'images/redbull.png', category: 'non-alcoholic' },
+    { name: 'Budvar', price: 59, currency: 'CZK', image: 'images/budvar.png', category: 'beer' },
     
     // 4. Prosecco
-    { name: 'Prosecco', price: 390, currency: 'CZK', image: 'images/prosecco.png' },
+    { name: 'Prosecco', price: 390, currency: 'CZK', image: 'images/prosecco.png', category: 'alcoholic' },
     
     // 5. Piva v sudu
-    { name: 'Pivo sud 30l', price: 125, currency: 'EUR', image: 'images/keg.png' },
-    { name: 'Pivo sud 50l', price: 175, currency: 'EUR', image: 'images/pivo50.png' },
+    { name: 'Pivo sud 30l', price: 125, currency: 'EUR', image: 'images/keg.png', category: 'beer' },
+    { name: 'Pivo sud 50l', price: 175, currency: 'EUR', image: 'images/pivo50.png', category: 'beer' },
     
     // 6. Wellness a grilly
-    { name: 'Plyn', price: 12, currency: 'EUR', image: 'images/Plyn.png' },
-    { name: 'Gril', price: 20, currency: 'EUR', image: 'images/grill.png' },
-    { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', customPrice: true }
+    { name: 'Plyn', price: 12, currency: 'EUR', image: 'images/Plyn.png', category: 'wellness' },
+    { name: 'Gril', price: 20, currency: 'EUR', image: 'images/grill.png', category: 'wellness' },
+    { name: 'Wellness', price: 0, currency: 'EUR', image: 'images/wellness.png', category: 'wellness', customPrice: true }
 ];
 
 const inventory = {
@@ -33,27 +33,3 @@ const inventory = {
     'amazing-pool': [...inventoryItems],
     'little-castle': [...inventoryItems]
 };
-
-function renderInventory(category = 'all') {
-    const inventoryEl = document.getElementById('inventory');
-    inventoryEl.innerHTML = '';
-    
-    const filteredItems = category === 'all' 
-        ? inventory[currentVilla] 
-        : inventory[currentVilla].filter(item => {
-            // Příklad kategorií podle názvu nebo vlastnosti
-            if (category === 'drinks') return ['Coca-Cola', 'Sprite', 'Fanta', 'Red Bull'].includes(item.name);
-            if (category === 'alcohol') return item.name.includes('Malibu') || item.name.includes('Gin');
-            return false;
-        });
-
-    filteredItems.forEach(item => {
-        // Stejný kód jako v původní funkci renderInventory
-    });
-}
-// HTML pro filtry
-<div class="filters">
-    <button onclick="renderInventory('all')">Vše</button>
-    <button onclick="renderInventory('drinks')">Nápoje</button>
-    <button onclick="renderInventory('alcohol')">Alkohol</button>
-</div>
