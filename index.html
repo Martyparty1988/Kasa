@@ -27,6 +27,14 @@
         </nav>
 
         <main class="main-content">
+            <div class="filters">
+                <button onclick="renderInventory('all')">Vše</button>
+                <button onclick="renderInventory('non-alcoholic')">Nápoje</button>
+                <button onclick="renderInventory('alcoholic')">Alkohol</button>
+                <button onclick="renderInventory('beer')">Piva</button>
+                <button onclick="renderInventory('wellness')">Wellness/Grilly</button>
+            </div>
+
             <div class="stats-bar">
                 <div class="stat">
                     <div class="stat-value" id="totalItems">0</div>
@@ -106,8 +114,7 @@
         <div class="modal-content" id="invoiceContent"></div>
     </div>
 
-    <!-- Skripty se načtou po zbytek dokumentu díky defer -->
-    <script src="inventory.js" defer></script>
-    <script src="app.js" defer></script>
+    <script src="inventory.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
