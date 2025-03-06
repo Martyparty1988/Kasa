@@ -64,12 +64,32 @@ body {
     transform: translateY(-2px);
 }
 
-.oh-yeah.active { background: var(--oh-yeah-gradient); }
-.amazing-pool.active { background: var(--amazing-pool-gradient); }
-.little-castle.active { background: var(--little-castle-gradient); }
+.oh-yeah.active { background: var(--oh-yeah-gradient); background: #FF6B6B; }
+.amazing-pool.active { background: var(--amazing-pool-gradient); background: #4ECDC4; }
+.little-castle.active { background: var(--little-castle-gradient); background: #96CEB4; }
 
 .main-content {
     padding: 15px;
+}
+
+.filters {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.filters button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    background: #f8f9fa;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.filters button:hover {
+    background: #e9ecef;
 }
 
 .stats-bar {
@@ -306,6 +326,15 @@ body {
     border-radius: 10px;
     font-size: 0.9em;
     margin-right: 10px;
+}
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
 }
 
 .cart-controls {
