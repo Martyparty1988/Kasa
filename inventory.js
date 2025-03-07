@@ -18,9 +18,9 @@ const inventoryItems = [
     // 4. Prosecco
     { name: 'Prosecco', price: 390, currency: 'CZK', image: 'images/prosecco.png', category: 'alcoholic' },
     
-    // 5. Piva v sudu
-    { name: 'Pivo sud 30l', price: 125, currency: 'EUR', image: 'images/keg.png', category: 'beer' },
-    { name: 'Pivo sud 50l', price: 175, currency: 'EUR', image: 'images/pivo50.png', category: 'beer' },
+    // 5. Sudy (nová kategorie)
+    { name: 'Pivo sud 30l', price: 125, currency: 'EUR', image: 'images/keg.png', category: 'kegs' },
+    { name: 'Pivo sud 50l', price: 175, currency: 'EUR', image: 'images/pivo50.png', category: 'kegs' },
     
     // 6. Wellness a grilly
     { name: 'Plyn', price: 12, currency: 'EUR', image: 'images/Plyn.png', category: 'wellness' },
