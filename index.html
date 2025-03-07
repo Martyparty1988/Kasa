@@ -12,16 +12,13 @@
         <nav class="villa-nav">
             <div class="tab-scroll">
                 <button class="villa-btn oh-yeah" onclick="selectVilla('oh-yeah')">
-                    <i class="fas fa-house"></i>
-                    <span>OH YEAH</span>
+                    OH YEAH
                 </button>
                 <button class="villa-btn amazing-pool" onclick="selectVilla('amazing-pool')">
-                    <i class="fas fa-water-ladder"></i>
-                    <span>Amazing Pool</span>
+                    Amazing Pool
                 </button>
                 <button class="villa-btn little-castle" onclick="selectVilla('little-castle')">
-                    <i class="fas fa-castle"></i>
-                    <span>Little Castle</span>
+                    Little Castle
                 </button>
             </div>
         </nav>
@@ -29,10 +26,9 @@
         <main class="main-content">
             <div class="filters">
                 <button onclick="renderInventory('all')">Vše</button>
-                <button onclick="renderInventory('non-alcoholic')">Nápoje</button>
-                <button onclick="renderInventory('alcoholic')">Alkohol</button>
-                <button onclick="renderInventory('beer')">Piva</button>
-                <button onclick="renderInventory('wellness')">Wellness/Grilly</button>
+                <button onclick="renderInventory('non-alcoholic')">Nealko</button>
+                <button onclick="renderInventory('alcoholic')">Alko</button>
+                <button onclick="renderInventory('wellness')">Wellness/Grily</button>
             </div>
 
             <div class="stats-bar">
@@ -56,7 +52,7 @@
             </div>
             <div class="quantity-controls">
                 <button class="quantity-btn" onclick="adjustQuantity(-1)">-</button>
-                <div class="quantity-display" id="quantityDisplay">1</div>
+                <input type="number" class="quantity-input" id="quantityDisplay" value="1" min="1" onchange="updateQuantityInput()">
                 <button class="quantity-btn" onclick="adjustQuantity(1)">+</button>
             </div>
             <div class="quantity-actions">
