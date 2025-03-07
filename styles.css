@@ -48,12 +48,15 @@ body {
     border-radius: 12px;
     font-weight: 600;
     background: #f8f9fa;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
     transition: all 0.3s ease;
-    font-size: 1.2em;
-    font-family: 'Georgia', serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+}
+
+.villa-btn i {
+    font-size: 20px;
 }
 
 .villa-btn.active {
@@ -61,12 +64,24 @@ body {
     transform: translateY(-2px);
 }
 
-.oh-yeah.active { background: var(--oh-yeah-gradient); }
-.amazing-pool.active { background: var(--amazing-pool-gradient); }
-.little-castle.active { background: var(--little-castle-gradient); }
+.oh-yeah.active { background: var(--oh-yeah-gradient); background: #FF6B6B; }
+.amazing-pool.active { background: var(--amazing-pool-gradient); background: #4ECDC4; }
+.little-castle.active { background: var(--little-castle-gradient); background: #96CEB4; }
 
 .main-content {
     padding: 15px;
+    transition: background-color 0.3s ease; /* Plynulý přechod barvy */
+}
+
+/* Barevná pozadí pro vily */
+.villa-background-oh-yeah {
+    background-color: #FFE6E6; /* Světle červená pro OH YEAH */
+}
+.villa-background-amazing-pool {
+    background-color: #E6F7F6; /* Světle tyrkysová pro Amazing Pool */
+}
+.villa-background-little-castle {
+    background-color: #E8F3EC; /* Světle zelená pro Little Castle */
 }
 
 .filters {
@@ -132,7 +147,6 @@ body {
     gap: 8px;
     transition: transform 0.2s;
     cursor: pointer;
-    background-color: var(--item-bg, #ffffff);
 }
 
 .item:active {
@@ -192,31 +206,14 @@ body {
     margin: 20px 0;
 }
 
-.quantity-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 25px;
-    border: none;
-    background: #f8f9fa;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.quantity-btn:active {
-    transform: scale(0.95);
-}
-
-.quantity-input {
+.quantity-display {
     font-size: 24px;
     font-weight: 600;
-    min-width: 60px;
+    min-width: 80px;
     text-align: center;
+    padding: 10px;
     border: 2px solid #eee;
     border-radius: 12px;
-    padding: 5px;
 }
 
 .quantity-actions {
@@ -407,10 +404,10 @@ select {
     padding: 25px;
     border-radius: 20px;
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    font-size: 0.9em;
+    font-size: 14px;
 }
 
 .invoice-header {
@@ -452,19 +449,17 @@ select {
     font-style: italic;
 }
 
-@media (max-width: 500px) {
+/* Responzivní úpravy */
+@media (max-width: 600px) {
     .modal-content {
-        font-size: 0.8em;
+        font-size: 12px;
     }
     .invoice-items .cart-item {
         flex-direction: column;
-        text-align: center;
+        text-align: left;
         gap: 5px;
     }
     .total {
-        text-align: center;
-    }
-    .payment-method {
         text-align: center;
     }
 }
