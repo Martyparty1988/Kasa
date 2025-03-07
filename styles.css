@@ -1,137 +1,72 @@
-/* Existing root variables remain unchanged */
+/* Updated root variables with new villa colors */
 :root {
-    --oh-yeah-color: #FF6B6B;
-    --oh-yeah-gradient: linear-gradient(135deg, #FF6B6B, #FF8E8E);
-    --amazing-pool-color: #4ECDC4;
-    --amazing-pool-gradient: linear-gradient(135deg, #4ECDC4, #45B7AF);
-    --little-castle-color: #96CEB4;
-    --little-castle-gradient: linear-gradient(135deg, #96CEB4, #7FB59D);
+    --oh-yeah-color: #FF69B4; /* Pink for OH YEAH */
+    --oh-yeah-gradient: linear-gradient(135deg, #FF69B4, #FF8EAF);
+    --amazing-pool-color: #40E0D0; /* Turquoise for Amazing Pool */
+    --amazing-pool-gradient: linear-gradient(135deg, #40E0D0, #00CED1);
+    --little-castle-color: #32CD32; /* Distinct green for Little Castle */
+    --little-castle-gradient: linear-gradient(135deg, #32CD32, #3CB371);
 }
 
-/* Global styles remain unchanged */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+/* Existing styles remain unchanged unless modified below */
+
+/* New scrollable category menu */
+.category-menu {
+    position: fixed;
+    top: 80px; /* Below the villa-nav */
+    left: 0;
+    width: 200px;
+    height: calc(100vh - 80px);
+    background: #fff;
+    padding: 10px 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: #f8f9fa;
-    min-height: 100vh;
-    position: relative;
+.category-menu.active {
+    transform: translateX(0);
 }
 
-.app-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding-bottom: 80px;
-}
-
-.villa-nav {
-    position: sticky;
-    top: 0;
-    background: white;
-    padding: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    z-index: 100;
-}
-
-.tab-scroll {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-}
-
-.villa-btn {
-    padding: 12px;
+.category-menu button {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
     border: none;
-    border-radius: 12px;
-    font-weight: 600;
     background: #f8f9fa;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.3s ease;
-    /* Remove i element styles, rely on text */
-    justify-content: center;
-}
-
-.villa-btn span {
-    font-size: 14px; /* Adjusted for text-only layout */
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.villa-btn.active {
-    color: white;
-    transform: translateY(-2px);
-}
-
-.oh-yeah.active { background: var(--oh-yeah-gradient); }
-.amazing-pool.active { background: var(--amazing-pool-gradient); }
-.little-castle.active { background: var(--little-castle-gradient); }
-
-.main-content {
-    padding: 15px;
-    transition: background-color 0.3s ease;
-}
-
-/* Villa background classes remain unchanged */
-.villa-background-oh-yeah { background-color: #FFE6E6; }
-.villa-background-amazing-pool { background-color: #E6F7F6; }
-.villa-background-little-castle { background-color: #E8F3EC; }
-
-.filters {
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: center; /* Center the dropdown */
-}
-
-.category-dropdown {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 12px;
-    background: #f8f9fa;
+    text-align: left;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.3s ease;
-    width: 100%;
-    max-width: 200px; /* Limit width for better mobile display */
-    font-size: 16px;
+    border-left: 4px solid transparent;
 }
 
-.category-dropdown:hover {
+.category-menu button:hover,
+.category-menu button.active {
     background: #e9ecef;
+    border-left-color: #2ecc71;
 }
 
-/* Rest of the styles (stats-bar, inventory, etc.) remain unchanged */
+.main-content {
+    padding-left: 220px; /* Offset for category menu */
+    transition: background-color 0.3s ease;
+}
 
-/* Responsive adjustments */
+/* Ensure inventory and other sections don't scroll with menu */
+.inventory, .stats-bar, .filters {
+    position: relative;
+    z-index: 1;
+}
+
+/* Existing media query adjustments */
 @media (max-width: 600px) {
-    .modal-content {
-        font-size: 12px;
+    .category-menu {
+        width: 150px;
+        top: 70px;
     }
-    .invoice-items .cart-item {
-        flex-direction: column;
-        text-align: left;
-        gap: 5px;
-    }
-    .total {
-        text-align: center;
-    }
-    .category-dropdown {
-        font-size: 14px; /* Smaller text for iPhone */
-        padding: 8px 12px;
-        max-width: 150px;
-    }
-    .tab-scroll {
-        grid-template-columns: 1fr; /* Stack villa buttons vertically on small screens */
-        gap: 5px;
-    }
-    .villa-btn span {
-        font-size: 12px; /* Adjust text size for small screens */
+    .main-content {
+        padding-left: 160px;
     }
 }
