@@ -9,6 +9,7 @@ let isCartOpen = false;
 function init() {
     selectVilla('oh-yeah');
     updateStats();
+    document.querySelector('.category-dropdown').value = 'all'; // Set default category
 }
 
 // Správa vil
@@ -17,7 +18,6 @@ function selectVilla(villa) {
     document.querySelectorAll('.villa-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`.${villa}`).classList.add('active');
     
-    // Změna pozadí podle vily
     const mainContent = document.querySelector('.main-content');
     mainContent.classList.remove('villa-background-oh-yeah', 'villa-background-amazing-pool', 'villa-background-little-castle');
     mainContent.classList.add(`villa-background-${villa}`);
@@ -31,7 +31,11 @@ function renderInventory(category = 'all') {
     
     const filteredItems = category === 'all' 
         ? inventory[currentVilla] 
-        : inventory[currentVilla].filter(item => item.category === category);
+        : inventory[currentVilla].filter(item => {
+            if (category === 'beer') return ['beer', 'kegs'].includes(item.category);
+            if (category === 'relax') return ['wellness'].includes(item.category); // Adjust for new category
+            return item.category === category;
+        });
 
     filteredItems.forEach(item => {
         const itemEl = document.createElement('div');
@@ -74,7 +78,7 @@ function handleItemClick(item) {
     }
 }
 
-// Správa množství
+// Správa množství (unchanged)
 function showQuantitySelector(item) {
     selectedItem = item;
     currentQuantity = 1;
@@ -111,7 +115,7 @@ function confirmQuantity() {
     updateStats();
 }
 
-// Správa košíku
+// Správa košíku (unchanged)
 function toggleCart() {
     const cartPanel = document.getElementById('cartPanel');
     isCartOpen = !isCartOpen;
@@ -157,7 +161,7 @@ function renderCart() {
     });
 }
 
-// Správa měny a výpočtů
+// Správa měny a výpočtů (unchanged)
 function updateExchangeRate() {
     const rate = prompt('Zadejte aktuální kurz EUR/CZK:', EXCHANGE_RATE);
     if (rate && !isNaN(rate) && rate > 0) {
@@ -175,11 +179,9 @@ function calculateTotal(currency) {
     const guests = parseInt(document.getElementById('guests').value) || 0;
     const nights = parseInt(document.getElementById('nights').value) || 0;
 
-    // City Tax výpočet (2 EUR za osobu na noc)
     const cityTax = guests * nights * 2;
     cityTaxTotal = currency === 'CZK' ? cityTax * EXCHANGE_RATE : cityTax;
 
-    // Součet položek
     cart.forEach(item => {
         let itemValue = item.price;
         if (item.currency !== currency) {
@@ -190,7 +192,6 @@ function calculateTotal(currency) {
         itemsTotal += itemValue * item.quantity;
     });
 
-    // Výpočet slevy pouze z položek (bez City Tax)
     const discountAmount = discount ? (itemsTotal * 0.1) : 0;
     const total = itemsTotal + cityTaxTotal;
 
@@ -205,7 +206,7 @@ function updateStats() {
         `${(total - discountAmount).toFixed(2)} ${currency}`;
 }
 
-// Generování faktury
+// Generování faktury (unchanged)
 function generateInvoice() {
     const currency = document.getElementById('currency').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
@@ -231,7 +232,6 @@ function generateInvoice() {
         'little-castle': 'var(--little-castle-color)'
     };
 
-    // Group items for invoice
     const groupedItems = cart.reduce((acc, item) => {
         const key = `${item.name}-${item.price}-${item.currency}`;
         if (!acc[key]) {
@@ -290,12 +290,10 @@ function generateInvoice() {
 // Event Listeners
 document.addEventListener('DOMContentLoaded', init);
 
-// Aktualizace množství při změně inputu
 document.getElementById('quantityDisplay').addEventListener('input', (e) => {
     adjustQuantity(e.target.value);
 });
 
-// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         if (document.getElementById('quantitySelector').style.display === 'block') {
