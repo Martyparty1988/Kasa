@@ -30,6 +30,8 @@ function renderInventory(category = 'all') {
     filteredItems.forEach(item => {
         const itemEl = document.createElement('div');
         itemEl.className = `item ${currentVilla}`;
+        // Přiřazení unikátního pozadí podle vily
+        itemEl.style.setProperty('--item-bg', getItemBackground(item));
         itemEl.innerHTML = `
             <div class="item-image">
                 <img src="${item.image}" alt="${item.name}">
@@ -40,6 +42,17 @@ function renderInventory(category = 'all') {
         itemEl.onclick = () => handleItemClick(item);
         inventoryEl.appendChild(itemEl);
     });
+}
+
+function getItemBackground(item) {
+    const villaColor = {
+        'oh-yeah': '#FF6B6B',
+        'amazing-pool': '#4ECDC4',
+        'little-castle': '#96CEB4'
+    }[currentVilla] || '#ffffff';
+    return item.category === 'non-alcoholic' ? `${villaColor}10` :
+           item.category === 'alcoholic' ? `${villaColor}20` :
+           item.category === 'wellness' ? `${villaColor}30` : '#ffffff';
 }
 
 function handleItemClick(item) {
@@ -75,7 +88,7 @@ function showQuantitySelector(item) {
     const selector = document.getElementById('quantitySelector');
     document.getElementById('selectedItemName').textContent = item.name;
     document.getElementById('selectedItemPrice').textContent = `${item.price} ${item.currency}`;
-    document.getElementById('quantityDisplay').textContent = currentQuantity;
+    document.getElementById('quantityDisplay').value = currentQuantity;
     selector.style.display = 'block';
 }
 
@@ -87,7 +100,12 @@ function hideQuantitySelector() {
 
 function adjustQuantity(delta) {
     currentQuantity = Math.max(1, currentQuantity + delta);
-    document.getElementById('quantityDisplay').textContent = currentQuantity;
+    document.getElementById('quantityDisplay').value = currentQuantity;
+}
+
+function updateQuantityInput() {
+    currentQuantity = Math.max(1, parseInt(document.getElementById('quantityDisplay').value) || 1);
+    document.getElementById('quantityDisplay').value = currentQuantity;
 }
 
 function confirmQuantity() {
@@ -169,7 +187,7 @@ function calculateTotal(currency) {
     const guests = parseInt(document.getElementById('guests').value) || 0;
     const nights = parseInt(document.getElementById('nights').value) || 0;
 
-    // City Tax výpočet (2 EUR za osobu na noc)
+    // Výpočet City Tax (2 EUR za osobu na noc)
     const cityTax = guests * nights * 2;
     cityTaxTotal = currency === 'CZK' ? cityTax * EXCHANGE_RATE : cityTax;
 
@@ -225,7 +243,7 @@ function generateInvoice() {
         'little-castle': 'var(--little-castle-color)'
     };
 
-    // Group items for invoice
+    // Seskupení položek pro fakturu
     const groupedItems = cart.reduce((acc, item) => {
         const key = `${item.name}-${item.price}-${item.currency}`;
         if (!acc[key]) {
@@ -284,7 +302,7 @@ function generateInvoice() {
 // Event Listeners
 document.addEventListener('DOMContentLoaded', init);
 
-// Keyboard shortcuts
+// Zkratky na klávesnici
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         if (document.getElementById('quantitySelector').style.display === 'block') {
