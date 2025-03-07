@@ -48,15 +48,12 @@ body {
     border-radius: 12px;
     font-weight: 600;
     background: #f8f9fa;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
+    text-align: center;
     transition: all 0.3s ease;
-}
-
-.villa-btn i {
-    font-size: 20px;
+    font-size: 1.2em;
+    font-family: 'Georgia', serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .villa-btn.active {
@@ -64,9 +61,9 @@ body {
     transform: translateY(-2px);
 }
 
-.oh-yeah.active { background: var(--oh-yeah-gradient); background: #FF6B6B; }
-.amazing-pool.active { background: var(--amazing-pool-gradient); background: #4ECDC4; }
-.little-castle.active { background: var(--little-castle-gradient); background: #96CEB4; }
+.oh-yeah.active { background: var(--oh-yeah-gradient); }
+.amazing-pool.active { background: var(--amazing-pool-gradient); }
+.little-castle.active { background: var(--little-castle-gradient); }
 
 .main-content {
     padding: 15px;
@@ -135,6 +132,7 @@ body {
     gap: 8px;
     transition: transform 0.2s;
     cursor: pointer;
+    background-color: var(--item-bg, #ffffff);
 }
 
 .item:active {
@@ -211,11 +209,14 @@ body {
     transform: scale(0.95);
 }
 
-.quantity-display {
+.quantity-input {
     font-size: 24px;
     font-weight: 600;
     min-width: 60px;
     text-align: center;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 5px;
 }
 
 .quantity-actions {
@@ -405,10 +406,11 @@ select {
     background: white;
     padding: 25px;
     border-radius: 20px;
-    width: 100%;
+    width: 90%;
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
+    font-size: 0.9em;
 }
 
 .invoice-header {
@@ -448,4 +450,21 @@ select {
     text-align: right;
     color: #666;
     font-style: italic;
+}
+
+@media (max-width: 500px) {
+    .modal-content {
+        font-size: 0.8em;
+    }
+    .invoice-items .cart-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+    }
+    .total {
+        text-align: center;
+    }
+    .payment-method {
+        text-align: center;
+    }
 }
