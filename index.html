@@ -12,15 +12,12 @@
         <nav class="villa-nav">
             <div class="tab-scroll">
                 <button class="villa-btn oh-yeah" onclick="selectVilla('oh-yeah')">
-                    <i class="fas fa-house"></i>
                     <span>OH YEAH</span>
                 </button>
                 <button class="villa-btn amazing-pool" onclick="selectVilla('amazing-pool')">
-                    <i class="fas fa-water-ladder"></i>
                     <span>Amazing Pool</span>
                 </button>
                 <button class="villa-btn little-castle" onclick="selectVilla('little-castle')">
-                    <i class="fas fa-castle"></i>
                     <span>Little Castle</span>
                 </button>
             </div>
@@ -28,12 +25,13 @@
 
         <main class="main-content">
             <div class="filters">
-                <button onclick="renderInventory('all')">Vše</button>
-                <button onclick="renderInventory('non-alcoholic')">Nápoje</button>
-                <button onclick="renderInventory('alcoholic')">Alkohol</button>
-                <button onclick="renderInventory('beer')">Piva</button>
-                <button onclick="renderInventory('kegs')">Sudy</button> <!-- Nový filtr -->
-                <button onclick="renderInventory('wellness')">Wellness/Grilly</button>
+                <select class="category-dropdown" onchange="renderInventory(this.value)">
+                    <option value="all">Vše</option>
+                    <option value="non-alcoholic">Nealko</option>
+                    <option value="alcoholic">Alkohol</option>
+                    <option value="beer">Piva</option>
+                    <option value="relax">Relax</option>
+                </select>
             </div>
 
             <div class="stats-bar">
