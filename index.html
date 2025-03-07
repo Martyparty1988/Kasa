@@ -12,13 +12,16 @@
         <nav class="villa-nav">
             <div class="tab-scroll">
                 <button class="villa-btn oh-yeah" onclick="selectVilla('oh-yeah')">
-                    OH YEAH
+                    <i class="fas fa-house"></i>
+                    <span>OH YEAH</span>
                 </button>
                 <button class="villa-btn amazing-pool" onclick="selectVilla('amazing-pool')">
-                    Amazing Pool
+                    <i class="fas fa-water-ladder"></i>
+                    <span>Amazing Pool</span>
                 </button>
                 <button class="villa-btn little-castle" onclick="selectVilla('little-castle')">
-                    Little Castle
+                    <i class="fas fa-castle"></i>
+                    <span>Little Castle</span>
                 </button>
             </div>
         </nav>
@@ -26,9 +29,11 @@
         <main class="main-content">
             <div class="filters">
                 <button onclick="renderInventory('all')">Vše</button>
-                <button onclick="renderInventory('non-alcoholic')">Nealko</button>
-                <button onclick="renderInventory('alcoholic')">Alko</button>
-                <button onclick="renderInventory('wellness')">Wellness/Grily</button>
+                <button onclick="renderInventory('non-alcoholic')">Nápoje</button>
+                <button onclick="renderInventory('alcoholic')">Alkohol</button>
+                <button onclick="renderInventory('beer')">Piva</button>
+                <button onclick="renderInventory('kegs')">Sudy</button> <!-- Nový filtr -->
+                <button onclick="renderInventory('wellness')">Wellness/Grilly</button>
             </div>
 
             <div class="stats-bar">
@@ -51,9 +56,7 @@
                 <div id="selectedItemPrice" class="item-price"></div>
             </div>
             <div class="quantity-controls">
-                <button class="quantity-btn" onclick="adjustQuantity(-1)">-</button>
-                <input type="number" class="quantity-input" id="quantityDisplay" value="1" min="1" onchange="updateQuantityInput()">
-                <button class="quantity-btn" onclick="adjustQuantity(1)">+</button>
+                <input type="number" id="quantityDisplay" class="quantity-display" min="1" value="1" onchange="adjustQuantity(this.value)">
             </div>
             <div class="quantity-actions">
                 <button class="cancel-btn" onclick="hideQuantitySelector()">Zrušit</button>
