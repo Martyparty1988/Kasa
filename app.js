@@ -1,317 +1,250 @@
-let EXCHANGE_RATE = 25.5;
-let currentVilla = null;
-let cart = [];
-let selectedItem = null;
-let currentQuantity = 1;
-let isCartOpen = false;
+// Inicializace prázdných polí pro data
+let items = [];
+let totalAmount = 0;
 
-// Inicializace aplikace
-function init() {
-    selectVilla('oh-yeah');
-    updateStats();
-    document.querySelector('.category-btn').classList.add('active'); // Default active category
-}
-
-// Správa vil
-function selectVilla(villa) {
-    currentVilla = villa;
-    document.querySelectorAll('.villa-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.${villa}`).classList.add('active');
+// Funkce pro načtení dat z localStorage při startu aplikace
+function loadDataFromLocalStorage() {
+    const savedItems = localStorage.getItem('kasaItems');
+    const savedTotal = localStorage.getItem('kasaTotal');
     
-    // Změna pozadí podle vily
-    const mainContent = document.querySelector('.main-content');
-    mainContent.classList.remove('villa-background-oh-yeah', 'villa-background-amazing-pool', 'villa-background-little-castle');
-    mainContent.classList.add(`villa-background-${villa}`);
+    if (savedItems) {
+        items = JSON.parse(savedItems);
+        renderItems();
+    }
     
-    renderInventory();
-}
-
-function renderInventory(category = 'all') {
-    const inventoryEl = document.getElementById('inventory');
-    inventoryEl.innerHTML = '';
-    
-    const filteredItems = category === 'all' 
-        ? inventory[currentVilla] 
-        : inventory[currentVilla].filter(item => item.category === category);
-
-    // Skip the first blank item for display
-    filteredItems.slice(1).forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = `item ${currentVilla}`;
-        itemEl.innerHTML = `
-            <div class="item-image">
-                <img src="${item.image}" alt="${item.name}">
-            </div>
-            <div class="item-name">${item.name}</div>
-            <div class="item-price">${item.customPrice ? 'Vlastní cena' : `${item.price} ${item.currency}`}</div>
-        `;
-        itemEl.onclick = () => handleItemClick(item);
-        inventoryEl.appendChild(itemEl);
-    });
-
-    // Update active category button
-    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.category-btn[onclick="renderInventory('${category}')"]`).classList.add('active');
-}
-
-function handleItemClick(item) {
-    if (item.name === 'Wellness balíček') {
-        const price = prompt('Zadejte cenu wellness balíčku v EUR:');
-        if (price === null || isNaN(price) || price <= 0) {
-            alert('Zadejte platnou kladnou cenu!');
-            return;
-        }
-        
-        const existingItem = cart.find(cartItem => cartItem.name === item.name && cartItem.price === parseFloat(price));
-        if (existingItem) {
-            existingItem.quantity++;
-        } else {
-            cart.push({
-                ...item,
-                id: Date.now(),
-                price: parseFloat(price),
-                quantity: 1
-            });
-        }
-        renderCart();
-        updateStats();
-    } else {
-        showQuantitySelector(item);
+    if (savedTotal) {
+        totalAmount = parseFloat(savedTotal);
+        updateTotalDisplay();
     }
 }
 
-// Správa množství
-function showQuantitySelector(item) {
-    selectedItem = item;
-    currentQuantity = 1;
-    const selector = document.getElementById('quantitySelector');
-    document.getElementById('selectedItemName').textContent = item.name;
-    document.getElementById('selectedItemPrice').textContent = `${item.price} ${item.currency}`;
-    document.getElementById('quantityDisplay').value = currentQuantity;
-    selector.style.display = 'block';
+// Funkce pro uložení dat do localStorage
+function saveDataToLocalStorage() {
+    localStorage.setItem('kasaItems', JSON.stringify(items));
+    localStorage.setItem('kasaTotal', totalAmount.toString());
 }
 
-function hideQuantitySelector() {
-    document.getElementById('quantitySelector').style.display = 'none';
-    selectedItem = null;
-    currentQuantity = 1;
-}
+// Funkce pro přidání nové položky
+function addItem() {
+    const itemName = document.getElementById('itemName').value;
+    const itemPrice = document.getElementById('itemPrice').value;
+    const itemQuantity = document.getElementById('itemQuantity').value;
 
-function adjustQuantity(value) {
-    currentQuantity = Math.max(1, parseInt(value) || 1);
-    document.getElementById('quantityDisplay').value = currentQuantity;
-}
-
-function confirmQuantity() {
-    const itemKey = `${selectedItem.name}-${selectedItem.price}-${selectedItem.currency}`;
-    const existingItem = cart.find(item => `${item.name}-${item.price}-${item.currency}` === itemKey);
-    
-    if (existingItem) {
-        existingItem.quantity += currentQuantity;
-    } else {
-        cart.push({ ...selectedItem, id: Date.now(), quantity: currentQuantity });
-    }
-    
-    hideQuantitySelector();
-    renderCart();
-    updateStats();
-}
-
-// Správa košíku
-function toggleCart() {
-    const cartPanel = document.getElementById('cartPanel');
-    isCartOpen = !isCartOpen;
-    cartPanel.classList.toggle('active', isCartOpen);
-}
-
-function removeFromCart(id) {
-    cart = cart.filter(item => item.id !== id);
-    renderCart();
-    updateStats();
-}
-
-function renderCart() {
-    const cartEl = document.getElementById('cartItems');
-    document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartEl.innerHTML = '';
-    
-    const groupedItems = cart.reduce((acc, item) => {
-        const key = `${item.name}-${item.price}-${item.currency}`;
-        if (!acc[key]) {
-            acc[key] = { ...item, quantity: 0 };
-        }
-        acc[key].quantity += item.quantity;
-        return acc;
-    }, {});
-    
-    Object.values(groupedItems).forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'cart-item';
-        itemEl.innerHTML = `
-            <div>
-                <span class="cart-item-quantity">×${item.quantity}</span>
-                ${item.name}
-            </div>
-            <div>
-                ${(item.price * item.quantity).toFixed(2)} ${item.currency}
-                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `;
-        cartEl.appendChild(itemEl);
-    });
-}
-
-// Správa měny a výpočtů
-function updateExchangeRate() {
-    const rate = prompt('Zadejte aktuální kurz EUR/CZK:', EXCHANGE_RATE);
-    if (rate && !isNaN(rate) && rate > 0) {
-        EXCHANGE_RATE = parseFloat(rate);
-        updateStats();
-    } else {
-        alert('Zadejte platný kladný kurz!');
-    }
-}
-
-function calculateTotal(currency) {
-    let itemsTotal = 0;
-    let cityTaxTotal = 0;
-    const discount = document.getElementById('discount').checked;
-    const guests = parseInt(document.getElementById('guests').value) || 0;
-    const nights = parseInt(document.getElementById('nights').value) || 0;
-
-    // City Tax výpočet (2 EUR za osobu na noc)
-    const cityTax = guests * nights * 2;
-    cityTaxTotal = currency === 'CZK' ? cityTax * EXCHANGE_RATE : cityTax;
-
-    // Součet položek
-    cart.forEach(item => {
-        let itemValue = item.price;
-        if (item.currency !== currency) {
-            itemValue = item.currency === 'EUR' 
-                ? itemValue * EXCHANGE_RATE 
-                : itemValue / EXCHANGE_RATE;
-        }
-        itemsTotal += itemValue * item.quantity;
-    });
-
-    // Výpočet slevy pouze z položek (bez City Tax)
-    const discountAmount = discount ? (itemsTotal * 0.1) : 0;
-    const total = itemsTotal + cityTaxTotal;
-
-    return { total, discountAmount, itemsTotal, cityTaxTotal };
-}
-
-function updateStats() {
-    const currency = document.getElementById('currency').value;
-    const { total, discountAmount } = calculateTotal(currency);
-    document.getElementById('totalItems').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.getElementById('totalAmount').textContent = 
-        `${(total - discountAmount).toFixed(2)} ${currency}`;
-}
-
-// Generování faktury
-function generateInvoice() {
-    const currency = document.getElementById('currency').value;
-    const paymentMethod = document.getElementById('paymentMethod').value;
-    const guests = parseInt(document.getElementById('guests').value) || 0;
-    const nights = parseInt(document.getElementById('nights').value) || 0;
-    const discount = document.getElementById('discount').checked;
-
-    if (guests <= 0 || nights <= 0) {
-        alert('Zadejte platný počet hostů a nocí (větší než 0)!');
+    // Validace vstupů
+    if (itemName.trim() === "") {
+        showError("Zadejte název položky.");
         return;
     }
 
-    const { total, discountAmount, itemsTotal, cityTaxTotal } = calculateTotal(currency);
-    const paymentMethods = {
-        cash: 'Hotově',
-        card: 'Kartou',
-        unpaid: 'Neplaceno'
+    if (itemPrice.trim() === "") {
+        showError("Zadejte cenu položky.");
+        return;
+    }
+
+    // Kontrola, že cena je platné číslo a není záporná
+    const price = parseFloat(itemPrice);
+    if (isNaN(price)) {
+        showError("Cena musí být číslo.");
+        return;
+    }
+
+    if (price < 0) {
+        showError("Cena nemůže být záporná.");
+        return;
+    }
+
+    // Kontrola, že množství je platné číslo a není záporné
+    const quantity = itemQuantity.trim() !== "" ? parseInt(itemQuantity) : 1;
+    if (isNaN(quantity)) {
+        showError("Množství musí být číslo.");
+        return;
+    }
+
+    if (quantity < 0) {
+        showError("Množství nemůže být záporné.");
+        return;
+    }
+
+    // Vytvoření nové položky
+    const newItem = {
+        id: Date.now(), // Unikátní ID pro každou položku
+        name: itemName,
+        price: price,
+        quantity: quantity,
+        total: price * quantity
     };
 
-    const villaColors = {
-        'oh-yeah': 'var(--oh-yeah-color)',
-        'amazing-pool': 'var(--amazing-pool-color)',
-        'little-castle': 'var(--little-castle-color)'
-    };
-
-    // Group items for invoice
-    const groupedItems = cart.reduce((acc, item) => {
-        const key = `${item.name}-${item.price}-${item.currency}`;
-        if (!acc[key]) {
-            acc[key] = { ...item, quantity: 0 };
-        }
-        acc[key].quantity += item.quantity;
-        return acc;
-    }, {});
-
-    const modal = document.getElementById('invoiceModal');
-    const content = document.getElementById('invoiceContent');
+    // Přidání položky do pole
+    items.push(newItem);
     
-    content.innerHTML = `
-        <div class="invoice-header" style="color: ${villaColors[currentVilla] || '#2ecc71'}">
-            <h2>${document.querySelector('.villa-btn.active').textContent}</h2>
-            <p>${new Date().toLocaleDateString()}</p>
-        </div>
-        <div class="invoice-items">
-            ${Object.values(groupedItems).map(item => `
-                <div class="cart-item">
-                    <span>${item.name} (×${item.quantity})</span>
-                    <span>${(item.price * item.quantity).toFixed(2)} ${item.currency}</span>
-                </div>
-            `).join('')}
-            <div class="cart-item subtotal">
-                <span>Mezisoučet položek</span>
-                <span>${itemsTotal.toFixed(2)} ${currency}</span>
-            </div>
-            ${discount ? `
-                <div class="cart-item discount">
-                    <span>Sleva 10% (z položek)</span>
-                    <span>-${discountAmount.toFixed(2)} ${currency}</span>
-                </div>
-            ` : ''}
-            <div class="cart-item">
-                <span>City Tax (${guests} hostů × ${nights} nocí)</span>
-                <span>${cityTaxTotal.toFixed(2)} ${currency}</span>
-            </div>
-        </div>
-        <div class="total">
-            Celkem: ${(total - discountAmount).toFixed(2)} ${currency}
-        </div>
-        <div class="payment-method">
-            Způsob platby: ${paymentMethods[paymentMethod]}
-        </div>
-    `;
+    // Aktualizace celkové částky
+    updateTotal();
     
-    modal.style.display = 'flex';
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    };
+    // Vykreslení položek
+    renderItems();
+    
+    // Uložení dat do localStorage
+    saveDataToLocalStorage();
+    
+    // Resetování formuláře
+    resetForm();
 }
 
-// Event Listeners
-document.addEventListener('DOMContentLoaded', init);
+// Funkce pro zobrazení chybové hlášky
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    
+    // Skrytí chybové hlášky po 3 sekundách
+    setTimeout(() => {
+        errorDiv.style.display = 'none';
+    }, 3000);
+}
 
-// Aktualizace množství při změně inputu
-document.getElementById('quantityDisplay').addEventListener('input', (e) => {
-    adjustQuantity(e.target.value);
-});
+// Funkce pro resetování formuláře
+function resetForm() {
+    document.getElementById('itemName').value = '';
+    document.getElementById('itemPrice').value = '';
+    document.getElementById('itemQuantity').value = '';
+}
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        if (document.getElementById('quantitySelector').style.display === 'block') {
-            hideQuantitySelector();
-        }
-        if (document.getElementById('invoiceModal').style.display === 'flex') {
-            document.getElementById('invoiceModal').style.display = 'none';
-        }
-        if (isCartOpen) {
-            toggleCart();
-        }
+// Funkce pro výpočet celkové částky
+function updateTotal() {
+    totalAmount = items.reduce((sum, item) => sum + item.total, 0);
+    updateTotalDisplay();
+    saveDataToLocalStorage();
+}
+
+// Funkce pro aktualizaci zobrazení celkové částky
+function updateTotalDisplay() {
+    document.getElementById('totalAmount').textContent = totalAmount.toFixed(2) + ' Kč';
+}
+
+// Funkce pro vykreslení položek
+function renderItems() {
+    const itemList = document.getElementById('itemList');
+    itemList.innerHTML = '';
+    
+    items.forEach(item => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.price.toFixed(2)} Kč</td>
+            <td>${item.quantity}</td>
+            <td>${item.total.toFixed(2)} Kč</td>
+            <td>
+                <button class="btn btn-sm btn-primary edit-btn" data-id="${item.id}">Upravit</button>
+                <button class="btn btn-sm btn-danger delete-btn" data-id="${item.id}">Odstranit</button>
+            </td>
+        `;
+        
+        itemList.appendChild(row);
+    });
+    
+    // Přidání event listenerů pro tlačítka
+    addButtonEventListeners();
+}
+
+// Funkce pro přidání event listenerů k tlačítkům
+function addButtonEventListeners() {
+    // Event listenery pro tlačítka odstranění
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const itemId = parseInt(e.target.getAttribute('data-id'));
+            deleteItem(itemId);
+        });
+    });
+    
+    // Event listenery pro tlačítka úpravy
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const itemId = parseInt(e.target.getAttribute('data-id'));
+            editItem(itemId);
+        });
+    });
+}
+
+// Funkce pro odstranění položky
+function deleteItem(itemId) {
+    items = items.filter(item => item.id !== itemId);
+    updateTotal();
+    renderItems();
+}
+
+// Funkce pro úpravu položky
+function editItem(itemId) {
+    const item = items.find(item => item.id === itemId);
+    
+    if (item) {
+        // Naplnění formuláře daty položky
+        document.getElementById('itemName').value = item.name;
+        document.getElementById('itemPrice').value = item.price;
+        document.getElementById('itemQuantity').value = item.quantity;
+        
+        // Odstranění původní položky
+        deleteItem(itemId);
+        
+        // Změna textu tlačítka
+        const addBtn = document.getElementById('addItemBtn');
+        const cancelBtn = document.getElementById('cancelEditBtn');
+        
+        addBtn.textContent = 'Uložit změny';
+        cancelBtn.style.display = 'inline-block';
     }
+}
+
+// Funkce pro zrušení úpravy
+function cancelEdit() {
+    resetForm();
+    
+    // Vrácení původního textu tlačítka
+    const addBtn = document.getElementById('addItemBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    
+    addBtn.textContent = 'Přidat položku';
+    cancelBtn.style.display = 'none';
+}
+
+// Funkce pro export do PDF
+function exportToPDF() {
+    if (items.length === 0) {
+        showError("Není co exportovat, přidejte nějaké položky.");
+        return;
+    }
+    
+    // Vytvoření obsahu pro PDF
+    const element = document.querySelector('.invoice-container').cloneNode(true);
+    
+    // Odstranění tlačítek z exportu
+    element.querySelectorAll('button').forEach(button => {
+        button.remove();
+    });
+    
+    // Konfigurace pro html2pdf
+    const opt = {
+        margin: 1,
+        filename: 'faktura.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generování PDF
+    html2pdf().set(opt).from(element).save();
+}
+
+// Event listenery
+document.addEventListener('DOMContentLoaded', () => {
+    // Načtení dat z localStorage
+    loadDataFromLocalStorage();
+    
+    // Přidání event listenerů
+    document.getElementById('addItemBtn').addEventListener('click', addItem);
+    document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
+    document.getElementById('exportPDFBtn').addEventListener('click', exportToPDF);
+    
+    // Skrytí tlačítka pro zrušení úpravy na začátku
+    document.getElementById('cancelEditBtn').style.display = 'none';
 });
