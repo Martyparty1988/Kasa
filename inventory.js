@@ -1,35 +1,108 @@
-const inventoryItems = [
-    // Blank first item
-    { name: '', price: 0, currency: 'CZK', image: '', category: '' },
-    
-    // 1. Nealkoholické nápoje
-    { name: 'Coca-Cola', price: 32, currency: 'CZK', image: 'images/cola.png', category: 'non-alcoholic' },
-    { name: 'Sprite', price: 32, currency: 'CZK', image: 'images/sprite.png', category: 'non-alcoholic' },
-    { name: 'Fanta', price: 32, currency: 'CZK', image: 'images/fanta.png', category: 'non-alcoholic' },
-    { name: 'Red Bull', price: 59, currency: 'CZK', image: 'images/redbull.png', category: 'non-alcoholic' },
-    
-    // 2. Alkoholické nápoje
-    { name: 'Malibu', price: 99, currency: 'CZK', image: 'images/malibu.png', category: 'alcoholic' },
-    { name: 'Jack’s Cola', price: 99, currency: 'CZK', image: 'images/jack.png', category: 'alcoholic' },
-    { name: 'Moscow Mule', price: 99, currency: 'CZK', image: 'images/moscow.png', category: 'alcoholic' },
-    { name: 'Gin Tonic', price: 99, currency: 'CZK', image: 'images/gin.png', category: 'alcoholic' },
-    { name: 'Mojito', price: 99, currency: 'CZK', image: 'images/mojito.png', category: 'alcoholic' },
-    { name: 'Prosecco', price: 390, currency: 'CZK', image: 'images/prosecco.png', category: 'alcoholic' },
-    
-    // 3. Piva
-    { name: 'Budvar', price: 59, currency: 'CZK', image: 'images/budvar.png', category: 'beer' },
-    { name: 'Sud 30 litrů', price: 125, currency: 'EUR', image: 'images/keg.png', category: 'beer' },
-    { name: 'Sud 50 litrů', price: 175, currency: 'EUR', image: 'images/pivo50.png', category: 'beer' },
-    { name: 'Budvar plechovka', price: 59, currency: 'CZK', image: 'images/budvar.png', category: 'beer' },
-    
-    // 4. Relax
-    { name: 'Wellness balíček', price: 0, currency: 'EUR', image: 'images/wellness.png', category: 'relax', customPrice: true },
-    { name: 'Grily', price: 20, currency: 'EUR', image: 'images/grill.png', category: 'relax' },
-    { name: 'Plyny do ohňových stolů', price: 12, currency: 'EUR', image: 'images/Plyn.png', category: 'relax' }
+// Definice produktů s cenami
+const inventory = [
+    {
+        id: 1,
+        name: "Vila Černá",
+        price: 2000,
+        imageUrl: "images/vila_cerna.jpg"
+    },
+    {
+        id: 2,
+        name: "Vila Zelená",
+        price: 2500,
+        imageUrl: "images/vila_zelena.jpg"
+    },
+    {
+        id: 3,
+        name: "Vila Bílá",
+        price: 1800,
+        imageUrl: "images/vila_bila.jpg"
+    }
 ];
 
-const inventory = {
-    'oh-yeah': [...inventoryItems],
-    'amazing-pool': [...inventoryItems],
-    'little-castle': [...inventoryItems]
-};
+// Funkce pro vykreslení produktů na hlavní stránce
+function renderInventory() {
+    const inventoryContainer = document.getElementById('inventory-container');
+    
+    // Pokud container neexistuje, jsme pravděpodobně na jiné stránce
+    if (!inventoryContainer) return;
+    
+    inventoryContainer.innerHTML = '';
+    
+    inventory.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'col-md-4 mb-4';
+        
+        card.innerHTML = `
+            <div class="card h-100">
+                <img src="${item.imageUrl}" class="card-img-top" alt="${item.name}">
+                <div class="card-body">
+                    <h5 class="card-title">${item.name}</h5>
+                    <p class="card-text">Cena: ${item.price} Kč/noc</p>
+                    <button class="btn btn-primary select-vila" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}">Vybrat</button>
+                </div>
+            </div>
+        `;
+        
+        inventoryContainer.appendChild(card);
+    });
+    
+    // Přidání event listenerů pro tlačítka "Vybrat"
+    addSelectButtonListeners();
+}
+
+// Funkce pro přidání event listenerů k tlačítkům "Vybrat"
+function addSelectButtonListeners() {
+    const selectButtons = document.querySelectorAll('.select-vila');
+    
+    selectButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const villaId = e.target.getAttribute('data-id');
+            const villaName = e.target.getAttribute('data-name');
+            const villaPrice = e.target.getAttribute('data-price');
+            
+            // Uložení vybrané vily do localStorage
+            localStorage.setItem('selectedVillaId', villaId);
+            localStorage.setItem('selectedVillaName', villaName);
+            localStorage.setItem('selectedVillaPrice', villaPrice);
+            
+            // Přesměrování na stránku s rozpočtem
+            window.location.href = 'kasa.html';
+        });
+    });
+}
+
+// Funkce pro načtení dat vybrané vily do formuláře na stránce kasa.html
+function loadSelectedVillaData() {
+    const villaNameElement = document.getElementById('selected-villa-name');
+    
+    // Pokud element neexistuje, jsme pravděpodobně na hlavní stránce
+    if (!villaNameElement) return;
+    
+    const villaName = localStorage.getItem('selectedVillaName');
+    const villaPrice = localStorage.getItem('selectedVillaPrice');
+    
+    if (villaName && villaPrice) {
+        villaNameElement.textContent = villaName;
+        
+        // Automaticky přidej ubytování jako první položku, pokud je seznam prázdný
+        const savedItems = localStorage.getItem('kasaItems');
+        if (!savedItems || JSON.parse(savedItems).length === 0) {
+            // Vyplň formulář daty vily
+            document.getElementById('itemName').value = `Ubytování - ${villaName}`;
+            document.getElementById('itemPrice').value = villaPrice;
+            document.getElementById('itemQuantity').value = 1;
+        }
+    } else {
+        villaNameElement.textContent = "Nebyla vybrána žádná vila";
+    }
+}
+
+// Inicializace při načtení stránky
+document.addEventListener('DOMContentLoaded', () => {
+    // Vykresli produkty na hlavní stránce
+    renderInventory();
+    
+    // Načti data vybrané vily na stránce kasa.html
+    loadSelectedVillaData();
+});
