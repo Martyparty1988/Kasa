@@ -3,26 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasa - Výběr vily</title>
+    <title>Kasa - Rozpis nákladů</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
+    <!-- Přidání knihovny html2pdf pro export do PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container mt-5 invoice-container">
         <!-- Hlavička -->
         <div class="row mb-4">
             <div class="col-12 text-center">
-                <h1>Výběr vily</h1>
-                <p>Vyberte vilu pro vytvoření rozpisu nákladů</p>
+                <h1>Rozpis nákladů</h1>
+                <p id="currentDate"></p>
             </div>
         </div>
         
-        <!-- Seznam vil -->
-        <div class="row" id="inventory-container">
-            <!-- Sem se dynamicky vloží vily z inventory.js -->
+        <!-- Formulář pro přidání položky -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Přidat položku</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label for="itemName" class="form-label">Název položky</label>
+                                <input type="text" class="form-control" id="itemName" placeholder="Název položky">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="itemPrice" class="form-label">Cena (Kč)</label>
+                                <input type="number" class="form-control" id="itemPrice" placeholder="Cena" min="0" step="0.01">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label for="itemQuantity" class="form-label">Množství</label>
+                                <input type="number" class="form-control" id="itemQuantity" placeholder="1" min="1" value="1">
+                            </div>
+                            <div class="col-md-2 mb-3 d-flex align-items-end">
+                                <button id="addItemBtn" class="btn btn-primary">Přidat položku</button>
+                                <button id="cancelEditBtn" class="btn btn-secondary ms-2" style="display: none;">Zrušit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seznam položek -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Položky</h5>
+                        <button id="exportPDFBtn" class="btn btn-success">Exportovat do PDF</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Položka</th>
+                                        <th>Cena</th>
+                                        <th>Množství</th>
+                                        <th>Celkem</th>
+                                        <th>Akce</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemList">
+                                    <!-- Sem se dynamicky vloží položky -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold">Celkem:</td>
+                                        <td id="totalAmount" class="fw-bold">0.00 Kč</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="inventory.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Zobrazení aktuálního data
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('cs-CZ', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
+        document.getElementById('currentDate').textContent = `Datum: ${formattedDate}`;
+    </script>
 </body>
 </html>
