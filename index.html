@@ -1,104 +1,539 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasa - Rozpis nákladů</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <!-- Přidání knihovny html2pdf pro export do PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
-<body>
-    <div class="container mt-5 invoice-container">
-        <!-- Hlavička -->
-        <div class="row mb-4">
-            <div class="col-12 text-center">
-                <h1>Rozpis nákladů</h1>
-                <p id="currentDate"></p>
-            </div>
-        </div>
-        
-        <!-- Formulář pro přidání položky -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Přidat položku</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
-                        <div class="row">
-                            <div class="col-md-5 mb-3">
-                                <label for="itemName" class="form-label">Název položky</label>
-                                <input type="text" class="form-control" id="itemName" placeholder="Název položky">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label for="itemPrice" class="form-label">Cena (Kč)</label>
-                                <input type="number" class="form-control" id="itemPrice" placeholder="Cena" min="0" step="0.01">
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <label for="itemQuantity" class="form-label">Množství</label>
-                                <input type="number" class="form-control" id="itemQuantity" placeholder="1" min="1" value="1">
-                            </div>
-                            <div class="col-md-2 mb-3 d-flex align-items-end">
-                                <button id="addItemBtn" class="btn btn-primary">Přidat položku</button>
-                                <button id="cancelEditBtn" class="btn btn-secondary ms-2" style="display: none;">Zrušit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Seznam položek -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5>Položky</h5>
-                        <button id="exportPDFBtn" class="btn btn-success">Exportovat do PDF</button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Položka</th>
-                                        <th>Cena</th>
-                                        <th>Množství</th>
-                                        <th>Celkem</th>
-                                        <th>Akce</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="itemList">
-                                    <!-- Sem se dynamicky vloží položky -->
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" class="text-end fw-bold">Celkem:</td>
-                                        <td id="totalAmount" class="fw-bold">0.00 Kč</td>
-                                        <td></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+import React, { useState, useEffect } from 'react';
+import { PlusCircle, MinusCircle, ShoppingCart, FileText, Home, Euro, Check } from 'lucide-react';
 
-    <script src="app.js"></script>
-    <script>
-        // Zobrazení aktuálního data
-        const today = new Date();
-        const formattedDate = today.toLocaleDateString('cs-CZ', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric' 
-        });
-        document.getElementById('currentDate').textContent = `Datum: ${formattedDate}`;
-    </script>
-</body>
-</html>
+const POS_App = () => {
+  // Kurz CZK/EUR
+  const [exchangeRate, setExchangeRate] = useState(25);
+  
+  // Seznam vil
+  const [villas, setVillas] = useState(['Vila A', 'Vila B', 'Vila C']);
+  const [selectedVilla, setSelectedVilla] = useState('Vila A');
+  
+  // Režim měny
+  const [currencyMode, setCurrencyMode] = useState('CZK');
+  
+  // Nastavení City Tax
+  const [guestCount, setGuestCount] = useState(4);
+  const [nightCount, setNightCount] = useState(3);
+  const cityTaxRate = 2; // EUR za noc a hosta
+  
+  // Sleva
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const discountRate = 0.10; // 10% sleva
+  
+  // Položky wellness
+  const [wellnessPrice, setWellnessPrice] = useState(0);
+
+  // Inventář položek
+  const inventory = [
+    { id: 1, name: 'Budvar', price: 59, currency: 'CZK', category: 'Nápoje' },
+    { id: 2, name: 'Malibu', price: 99, currency: 'CZK', category: 'Nápoje' },
+    { id: 3, name: 'Jack s colou', price: 99, currency: 'CZK', category: 'Nápoje' },
+    { id: 4, name: 'Moscow Mule', price: 99, currency: 'CZK', category: 'Nápoje' },
+    { id: 5, name: 'Gin-Tonic', price: 99, currency: 'CZK', category: 'Nápoje' },
+    { id: 6, name: 'Mojito', price: 99, currency: 'CZK', category: 'Nápoje' },
+    { id: 7, name: 'Coca-Cola', price: 32, currency: 'CZK', category: 'Nápoje' },
+    { id: 8, name: 'Fanta', price: 32, currency: 'CZK', category: 'Nápoje' },
+    { id: 9, name: 'Sprite', price: 32, currency: 'CZK', category: 'Nápoje' },
+    { id: 10, name: 'Red Bull', price: 59, currency: 'CZK', category: 'Nápoje' },
+    { id: 11, name: 'Prosecco', price: 390, currency: 'CZK', category: 'Nápoje' },
+    { id: 12, name: 'Pivo sud 30 l', price: 125, currency: 'EUR', category: 'Nápoje' },
+    { id: 13, name: 'Pivo sud 50 l', price: 175, currency: 'EUR', category: 'Nápoje' },
+    { id: 14, name: 'Plyn', price: 12, currency: 'EUR', category: 'Služby' },
+    { id: 15, name: 'Gril', price: 20, currency: 'EUR', category: 'Služby' },
+    { id: 16, name: 'Wellness', price: wellnessPrice, currency: 'EUR', category: 'Služby', isCustomPrice: true },
+  ];
+
+  // Kategorie
+  const categories = [...new Set(inventory.map(item => item.category))];
+  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+
+  // Košík
+  const [cart, setCart] = useState([]);
+  
+  // Aktivní stránka
+  const [activePage, setActivePage] = useState('pos');
+  
+  // Konverze měny
+  const convertCurrency = (amount, fromCurrency, toCurrency) => {
+    if (fromCurrency === toCurrency) return amount;
+    if (fromCurrency === 'CZK' && toCurrency === 'EUR') return amount / exchangeRate;
+    if (fromCurrency === 'EUR' && toCurrency === 'CZK') return amount * exchangeRate;
+    return amount;
+  };
+  
+  // Přidat položku do košíku
+  const addToCart = (item) => {
+    const existingIndex = cart.findIndex(cartItem => cartItem.id === item.id);
+    
+    if (existingIndex >= 0) {
+      const updatedCart = [...cart];
+      updatedCart[existingIndex].quantity += 1;
+      setCart(updatedCart);
+    } else {
+      setCart([...cart, { ...item, quantity: 1 }]);
+    }
+  };
+  
+  // Odebrat položku z košíku
+  const removeFromCart = (itemId) => {
+    const existingIndex = cart.findIndex(cartItem => cartItem.id === itemId);
+    
+    if (existingIndex >= 0) {
+      const updatedCart = [...cart];
+      if (updatedCart[existingIndex].quantity > 1) {
+        updatedCart[existingIndex].quantity -= 1;
+      } else {
+        updatedCart.splice(existingIndex, 1);
+      }
+      setCart(updatedCart);
+    }
+  };
+  
+  // Přidat City Tax do košíku
+  const addCityTax = () => {
+    const cityTaxTotal = guestCount * nightCount * cityTaxRate;
+    
+    // Odstraníme existující city tax položku, pokud existuje
+    const cartWithoutCityTax = cart.filter(item => item.id !== 'city-tax');
+    
+    // Přidáme novou city tax položku
+    setCart([
+      ...cartWithoutCityTax,
+      {
+        id: 'city-tax',
+        name: `City Tax (${guestCount} hostů × ${nightCount} nocí)`,
+        price: cityTaxTotal,
+        currency: 'EUR',
+        quantity: 1,
+        isCityTax: true
+      }
+    ]);
+  };
+  
+  // Přidat Wellness do košíku
+  const addWellness = () => {
+    if (wellnessPrice <= 0) return;
+    
+    const wellnessItem = {
+      ...inventory.find(item => item.name === 'Wellness'),
+      price: wellnessPrice
+    };
+    
+    const existingIndex = cart.findIndex(item => item.name === 'Wellness');
+    
+    if (existingIndex >= 0) {
+      const updatedCart = [...cart];
+      updatedCart[existingIndex] = { ...wellnessItem, quantity: 1 };
+      setCart(updatedCart);
+    } else {
+      addToCart(wellnessItem);
+    }
+  };
+  
+  // Výpočet celkové ceny
+  const calculateTotal = () => {
+    // Nejprve spočítáme celkovou cenu bez slevy
+    const total = cart.reduce((sum, item) => {
+      const itemPrice = item.price * item.quantity;
+      return sum + convertCurrency(itemPrice, item.currency, currencyMode);
+    }, 0);
+    
+    // Celková cena položek, na které se může aplikovat sleva
+    const discountableTotal = cart.reduce((sum, item) => {
+      // City Tax nepodléhá slevě
+      if (item.isCityTax) return sum;
+      
+      const itemPrice = item.price * item.quantity;
+      return sum + convertCurrency(itemPrice, item.currency, currencyMode);
+    }, 0);
+    
+    // Celková cena položek, které nepodléhají slevě (City Tax)
+    const nonDiscountableTotal = total - discountableTotal;
+    
+    // Aplikace slevy, pokud je aktivována
+    if (discountApplied) {
+      const discount = discountableTotal * discountRate;
+      return nonDiscountableTotal + (discountableTotal - discount);
+    }
+    
+    return total;
+  };
+  
+  // Formátování ceny
+  const formatPrice = (price, currency) => {
+    return price.toFixed(2) + (currency === 'CZK' ? ' Kč' : ' €');
+  };
+  
+  // Vygenerování faktury
+  const generateInvoice = () => {
+    setActivePage('invoice');
+  };
+  
+  // Reset košíku
+  const resetCart = () => {
+    setCart([]);
+    setDiscountApplied(false);
+    setActivePage('pos');
+    setWellnessPrice(0);
+  };
+  
+  // Exportovat fakturu jako JPEG
+  const exportInvoice = () => {
+    // Tato funkce by ve skutečné aplikaci uložila fakturu jako JPEG
+    alert('Faktura byla exportována jako JPEG');
+  };
+  
+  // Zobrazení POS stránky
+  const POSPage = () => (
+    <div className="flex flex-col h-screen">
+      {/* Horní panel */}
+      <div className="bg-blue-600 text-white p-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-bold">POS Systém</h1>
+          <div className="flex space-x-2">
+            <button 
+              onClick={() => setCurrencyMode('CZK')} 
+              className={`px-3 py-1 rounded ${currencyMode === 'CZK' ? 'bg-blue-800' : 'bg-blue-700'}`}
+            >
+              CZK
+            </button>
+            <button 
+              onClick={() => setCurrencyMode('EUR')} 
+              className={`px-3 py-1 rounded ${currencyMode === 'EUR' ? 'bg-blue-800' : 'bg-blue-700'}`}
+            >
+              <Euro size={16} />
+            </button>
+          </div>
+        </div>
+        
+        {/* Výběr vily */}
+        <div className="mt-2">
+          <label className="block text-sm">Vyberte vilu:</label>
+          <select 
+            value={selectedVilla} 
+            onChange={(e) => setSelectedVilla(e.target.value)}
+            className="mt-1 w-full p-2 bg-blue-700 rounded"
+          >
+            {villas.map(villa => (
+              <option key={villa} value={villa}>{villa}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      
+      {/* Hlavní obsah */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Levý panel - kategorie a položky */}
+        <div className="w-2/3 flex flex-col border-r">
+          {/* Kategorie */}
+          <div className="p-2 bg-gray-100 flex space-x-2 overflow-x-auto">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-lg ${selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+          
+          {/* Položky */}
+          <div className="flex-1 p-4 grid grid-cols-3 gap-4 overflow-y-auto">
+            {inventory
+              .filter(item => item.category === selectedCategory)
+              .map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => addToCart(item)}
+                  className="p-4 bg-white rounded-lg shadow hover:shadow-md text-center"
+                >
+                  <div className="font-medium">{item.name}</div>
+                  <div className="text-sm text-gray-600">
+                    {item.isCustomPrice 
+                      ? 'Vlastní cena'
+                      : formatPrice(convertCurrency(item.price, item.currency, currencyMode), currencyMode)
+                    }
+                  </div>
+                </button>
+              ))}
+          </div>
+          
+          {/* Speciální položky */}
+          <div className="p-4 bg-gray-100 border-t">
+            {/* City Tax */}
+            <div className="flex mb-4 items-center">
+              <div className="w-1/2">
+                <h3 className="font-medium">City Tax</h3>
+                <div className="flex items-center mt-1 space-x-2">
+                  <label className="text-sm">Hosté:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={guestCount}
+                    onChange={(e) => setGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-16 p-1 border rounded"
+                  />
+                  <label className="text-sm ml-2">Noci:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={nightCount}
+                    onChange={(e) => setNightCount(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-16 p-1 border rounded"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={addCityTax}
+                className="ml-auto px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Přidat ({guestCount * nightCount * cityTaxRate} €)
+              </button>
+            </div>
+            
+            {/* Wellness */}
+            <div className="flex items-center">
+              <div className="w-1/2">
+                <h3 className="font-medium">Wellness</h3>
+                <div className="flex items-center mt-1">
+                  <label className="text-sm">Cena (€):</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={wellnessPrice}
+                    onChange={(e) => setWellnessPrice(Math.max(0, parseFloat(e.target.value) || 0))}
+                    className="ml-2 w-20 p-1 border rounded"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={addWellness}
+                className="ml-auto px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                disabled={wellnessPrice <= 0}
+              >
+                Přidat
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Pravý panel - košík */}
+        <div className="w-1/3 flex flex-col bg-gray-50">
+          <div className="p-4 border-b">
+            <h2 className="text-lg font-bold flex items-center">
+              <ShoppingCart size={20} className="mr-2" /> Košík
+            </h2>
+          </div>
+          
+          {/* Seznam položek v košíku */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {cart.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">Košík je prázdný</p>
+            ) : (
+              cart.map((item, index) => (
+                <div key={index} className="flex justify-between items-center mb-4 p-2 bg-white rounded shadow">
+                  <div>
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-sm text-gray-600">
+                      {formatPrice(convertCurrency(item.price, item.currency, currencyMode), currencyMode)} × {item.quantity}
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="p-1 rounded-full hover:bg-gray-200"
+                    >
+                      <MinusCircle size={20} className="text-red-500" />
+                    </button>
+                    <span className="mx-2">{item.quantity}</span>
+                    <button
+                      onClick={() => addToCart(item)}
+                      className="p-1 rounded-full hover:bg-gray-200"
+                    >
+                      <PlusCircle size={20} className="text-green-500" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          
+          {/* Shrnutí košíku */}
+          <div className="p-4 bg-gray-100 border-t">
+            {/* Sleva */}
+            <div className="flex items-center justify-between mb-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={discountApplied}
+                  onChange={() => setDiscountApplied(!discountApplied)}
+                  className="mr-2"
+                />
+                <span>Aplikovat 10% slevu</span>
+              </label>
+              {discountApplied && (
+                <span className="text-green-600 font-medium">Sleva aktivována</span>
+              )}
+            </div>
+            
+            {/* Celková cena */}
+            <div className="flex justify-between items-center my-2 font-bold">
+              <span>Celkem:</span>
+              <span className="text-xl">{formatPrice(calculateTotal(), currencyMode)}</span>
+            </div>
+            
+            {/* Tlačítka */}
+            <div className="flex space-x-2 mt-4">
+              <button
+                onClick={resetCart}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Zrušit
+              </button>
+              <button
+                onClick={generateInvoice}
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
+                disabled={cart.length === 0}
+              >
+                Faktura
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+  
+  // Zobrazení faktury
+  const InvoicePage = () => {
+    const totalAmount = calculateTotal();
+    const date = new Date().toLocaleDateString();
+    const invoiceNumber = `INV-${Date.now().toString().slice(-6)}`;
+    
+    return (
+      <div className="flex flex-col h-screen">
+        {/* Horní panel */}
+        <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold">Faktura #{invoiceNumber}</h1>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setActivePage('pos')}
+              className="flex items-center px-3 py-1 bg-blue-700 rounded"
+            >
+              <Home size={16} className="mr-1" /> Zpět
+            </button>
+            <button
+              onClick={exportInvoice}
+              className="flex items-center px-3 py-1 bg-green-600 rounded"
+            >
+              <FileText size={16} className="mr-1" /> Export JPEG
+            </button>
+          </div>
+        </div>
+        
+        {/* Obsah faktury */}
+        <div className="flex-1 p-6 overflow-auto">
+          <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow">
+            {/* Hlavička faktury */}
+            <div className="border-b pb-4 mb-6">
+              <h2 className="text-2xl font-bold text-center text-blue-600">Faktura</h2>
+              <div className="flex justify-between mt-4">
+                <div>
+                  <p className="text-gray-600">Datum: {date}</p>
+                  <p className="text-gray-600">Faktura č.: {invoiceNumber}</p>
+                  <p className="text-gray-600">Vila: {selectedVilla}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-gray-600">Vystavil: POS Systém</p>
+                  <p className="text-gray-600">Měna: {currencyMode}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Seznam položek */}
+            <table className="w-full mb-6">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2">Položka</th>
+                  <th className="text-right py-2">Cena/ks</th>
+                  <th className="text-right py-2">Množství</th>
+                  <th className="text-right py-2">Celkem</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cart.map((item, index) => {
+                  const itemPrice = convertCurrency(item.price, item.currency, currencyMode);
+                  const itemTotal = itemPrice * item.quantity;
+                  
+                  // Zobrazit slevu, pokud je aplikována
+                  const discounted = discountApplied && !item.isCityTax;
+                  const discountedTotal = discounted ? itemTotal * (1 - discountRate) : itemTotal;
+                  
+                  return (
+                    <tr key={index} className="border-b">
+                      <td className="py-2">{item.name}</td>
+                      <td className="text-right py-2">{formatPrice(itemPrice, currencyMode)}</td>
+                      <td className="text-right py-2">{item.quantity}</td>
+                      <td className="text-right py-2">
+                        {discounted ? (
+                          <div>
+                            <span className="line-through text-gray-500">{formatPrice(itemTotal, currencyMode)}</span>
+                            <span className="ml-2 text-green-600">{formatPrice(discountedTotal, currencyMode)}</span>
+                          </div>
+                        ) : (
+                          formatPrice(itemTotal, currencyMode)
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            
+            {/* Souhrn */}
+            <div className="border-t pt-4">
+              {/* Zobrazit shrnutí slevy, pokud je aplikována */}
+              {discountApplied && (
+                <div className="flex justify-between mb-2">
+                  <span>Sleva (10%):</span>
+                  <span className="text-green-600">
+                    -{formatPrice(
+                      cart.reduce((sum, item) => {
+                        if (item.isCityTax) return sum;
+                        const itemPrice = convertCurrency(item.price, item.currency, currencyMode);
+                        return sum + (itemPrice * item.quantity * discountRate);
+                      }, 0),
+                      currencyMode
+                    )}
+                  </span>
+                </div>
+              )}
+              
+              {/* Celková částka */}
+              <div className="flex justify-between font-bold text-lg">
+                <span>Celkem k úhradě:</span>
+                <span>{formatPrice(totalAmount, currencyMode)}</span>
+              </div>
+            </div>
+            
+            {/* Patička faktury */}
+            <div className="mt-8 pt-8 border-t text-center text-gray-600 text-sm">
+              <p>Děkujeme za Vaši návštěvu!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  return (
+    <div>
+      {activePage === 'pos' && <POSPage />}
+      {activePage === 'invoice' && <InvoicePage />}
+    </div>
+  );
+};
+
+export default POS_App;
