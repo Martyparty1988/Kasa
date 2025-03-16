@@ -4,584 +4,505 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Správa Minibaru</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         :root {
-            --oh-yeah-color: #F8B195;
-            --amazing-pool-color: #F67280;
-            --little-castle-color: #C06C84;
-            --primary-color: #6C5B7B;
-            --secondary-color: #355C7D;
-            --accent-color: #F67280;
-            --light-color: #F7FFF7;
-            --dark-color: #355C7D;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --oh-yeah-color: #c03546;
+            --amazing-pool-color: #3573b5;
+            --little-castle-color: #6a3d99;
+            --main-bg-color: #f5f5f5;
+            --accent-color: #333;
         }
-
+        
         * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f9f7f7;
-            color: var(--dark-color);
-            line-height: 1.6;
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-            border-radius: 0 0 20px 20px;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
+            background-color: var(--main-bg-color);
+            padding: 20px;
         }
         
-        header:before {
-            content: "";
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            width: 150px;
-            height: 150px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            z-index: 1;
-        }
-        
-        header h1 {
-            position: relative;
-            z-index: 2;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .container {
+        .app-container {
+            display: flex;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem;
-        }
-
-        .villa-selection {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .villa-btn {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            opacity: 0.7;
-            letter-spacing: 0.5px;
-            font-size: 0.95rem;
-        }
-
-        .villa-btn.active {
-            opacity: 1;
-            transform: scale(1.05);
-            box-shadow: var(--shadow);
-        }
-
-        .oh-yeah {
-            background-color: var(--oh-yeah-color);
-            color: white;
-        }
-
-        .amazing-pool {
-            background-color: var(--amazing-pool-color);
-            color: white;
-        }
-
-        .little-castle {
-            background-color: var(--little-castle-color);
-            color: white;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .inventory-section {
             background: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
             border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-        }
-
-        .sidebar {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            height: fit-content;
-        }
-
-        .section-title {
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #eee;
-            color: var(--primary-color);
-        }
-
-        .inventory {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-        }
-
-        .item {
-            border-radius: 15px;
-            padding: 1.2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            height: 150px;
-            background-color: white;
             overflow: hidden;
         }
-
-        .item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-            border-color: var(--accent-color);
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #333;
+            color: white;
+            padding: 20px 0;
         }
-
-        .item i {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+        
+        .sidebar h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            padding: 0 15px;
         }
-
-        .item-name {
-            font-weight: bold;
-            margin-bottom: 0.3rem;
-            font-size: 0.9rem;
-        }
-
-        .item-price {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .oh-yeah {
-            border: 2px solid var(--oh-yeah-color);
-        }
-
-        .amazing-pool {
-            border: 2px solid var(--amazing-pool-color);
-        }
-
-        .little-castle {
-            border: 2px solid var(--little-castle-color);
-        }
-
+        
         .sidebar-section {
-            margin-bottom: 1.5rem;
+            margin-bottom: 30px;
         }
-
-        .form-control {
-            margin-bottom: 1rem;
+        
+        .sidebar-section h2 {
+            font-size: 18px;
+            padding: 0 15px;
+            margin-bottom: 10px;
         }
-
-        label {
+        
+        .villa-btn {
             display: block;
-            margin-bottom: 0.3rem;
-            font-weight: 500;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
-        .cart-button {
-            position: relative;
-            padding: 0.8rem 1.5rem;
-            background-color: var(--primary-color);
+            padding: 10px 15px;
+            text-decoration: none;
             color: white;
-            border: none;
-            border-radius: 5px;
+            transition: background 0.3s;
             cursor: pointer;
+        }
+        
+        .villa-btn:hover {
+            background: #444;
+        }
+        
+        .villa-btn.active {
             font-weight: bold;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s;
         }
-
-        .cart-button:hover {
-            background-color: #13424A;
+        
+        .oh-yeah.active {
+            background: var(--oh-yeah-color);
         }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: var(--accent-color);
+        
+        .amazing-pool.active {
+            background: var(--amazing-pool-color);
+        }
+        
+        .little-castle.active {
+            background: var(--little-castle-color);
+        }
+        
+        .category-btn {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
             color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.8rem;
+            transition: background 0.3s;
+            cursor: pointer;
         }
-
-        .cart-panel {
-            position: fixed;
-            top: 0;
-            right: -400px;
-            width: 400px;
-            height: 100vh;
-            background: white;
-            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-            transition: right 0.3s ease;
-            z-index: 1000;
+        
+        .category-btn:hover {
+            background: #444;
+        }
+        
+        .category-btn.active {
+            background: #555;
+            font-weight: bold;
+        }
+        
+        /* Main content */
+        .main-content {
+            flex: 1;
             display: flex;
             flex-direction: column;
         }
-
-        .cart-panel.active {
-            right: 0;
-        }
-
-        .cart-header {
-            padding: 1rem;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cart-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .cart-items {
+        
+        /* Inventory section */
+        .inventory {
             flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
             overflow-y: auto;
-            padding: 1rem;
+            max-height: calc(100vh - 400px);
         }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .cart-item-quantity {
-            background-color: #eee;
-            padding: 0.1rem 0.4rem;
-            border-radius: 3px;
-            margin-right: 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        .cart-item-remove {
-            background: none;
-            border: none;
-            color: var(--accent-color);
+        
+        .item {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 15px;
+            transition: transform 0.2s;
             cursor: pointer;
-            font-size: 0.9rem;
         }
-
-        .cart-footer {
-            padding: 1rem;
-            background-color: #f5f5f5;
+        
+        .item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .item img {
+            max-width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .item-price {
+            color: #666;
+        }
+        
+        /* Settings section */
+        .settings {
+            padding: 20px;
+            background: #f9f9f9;
             border-top: 1px solid #eee;
         }
-
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .settings-column {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .settings label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .settings input,
+        .settings select {
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .settings input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+        }
+        
+        .discount-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
         .invoice-btn {
-            width: 100%;
-            padding: 0.8rem;
-            background-color: var(--accent-color);
+            background: var(--accent-color);
             color: white;
             border: none;
-            border-radius: 5px;
+            padding: 10px 15px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
+            transition: background 0.3s;
+            margin-top: 15px;
         }
-
+        
         .invoice-btn:hover {
-            background-color: #ff5252;
+            background: #555;
         }
-
-        /* Quantity Selector */
+        
+        /* Quantity selector */
         .quantity-selector {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.8);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 100;
         }
-
+        
         .quantity-selector-content {
-            background-color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
             text-align: center;
         }
-
-        .quantity-title {
-            margin-bottom: 1rem;
+        
+        .quantity-selector-content h3 {
+            margin-bottom: 15px;
         }
-
-        .quantity-price {
+        
+        .quantity-selector-content p {
+            margin-bottom: 15px;
             color: #666;
-            margin-bottom: 1.5rem;
         }
-
+        
         .quantity-controls {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin: 20px 0;
         }
-
+        
         .quantity-btn {
+            background: #eee;
+            border: none;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: none;
-            background-color: #eee;
-            font-size: 1.2rem;
+            font-size: 20px;
             cursor: pointer;
+        }
+        
+        .quantity-btn:hover {
+            background: #ddd;
+        }
+        
+        .quantity-display {
+            margin: 0 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .quantity-selector-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .quantity-selector-buttons button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .cancel-btn {
+            background: #eee;
+        }
+        
+        .confirm-btn {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        /* Cart */
+        .cart-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
-        .quantity-display {
-            font-size: 1.5rem;
-            font-weight: bold;
-            min-width: 50px;
-        }
-
-        .quantity-actions {
+        
+        .cart-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s;
+            z-index: 50;
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
         }
-
-        .quantity-actions button {
-            flex: 1;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
+        
+        .cart-panel.active {
+            right: 0;
         }
-
-        .cancel-btn {
-            background-color: #eee;
-            color: #666;
-        }
-
-        .confirm-btn {
-            background-color: var(--secondary-color);
+        
+        .cart-header {
+            padding: 15px;
+            background: var(--accent-color);
             color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-
-        /* Invoice Modal */
+        
+        .cart-header h2 {
+            margin: 0;
+        }
+        
+        .cart-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item-quantity {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .cart-item-remove:hover {
+            color: red;
+        }
+        
+        /* Invoice modal */
         .invoice-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.8);
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 100;
         }
-
+        
         .invoice-content {
-            background-color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 500px;
             max-height: 80vh;
             overflow-y: auto;
         }
-
+        
         .invoice-header {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
-
+        
         .invoice-items {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
         }
-
+        
         .subtotal, .discount {
             font-weight: bold;
-            margin-top: 0.5rem;
+            margin-top: 10px;
         }
-
-        .discount {
-            color: var(--accent-color);
-        }
-
+        
         .total {
-            font-size: 1.3rem;
+            font-size: 24px;
             font-weight: bold;
+            margin: 20px 0;
             text-align: right;
-            margin-bottom: 1rem;
         }
-
+        
         .payment-method {
             text-align: right;
             color: #666;
         }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .inventory {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
-
-            .cart-panel {
-                width: 100%;
-                right: -100%;
-            }
-        }
-        
-        /* Přidané CSS pro kategorie */
-        .category-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .category-tab {
-            background-color: #f1f1f1;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-        
-        .category-tab:hover {
-            background-color: #e1e1e1;
-        }
-        
-        .category-tab.active {
-            background-color: var(--accent-color);
-            color: white;
-        }
-        
-        .item-image {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Pro položky bez obrázků */
-        .item-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary-color);
-        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Správa Minibaru</h1>
-    </header>
-
-    <div class="container">
-        <div class="villa-selection">
-            <button class="villa-btn oh-yeah" onclick="selectVilla('oh-yeah')">Oh Yeah Villa</button>
-            <button class="villa-btn amazing-pool" onclick="selectVilla('amazing-pool')">Amazing Pool Villa</button>
-            <button class="villa-btn little-castle" onclick="selectVilla('little-castle')">Little Castle Villa</button>
-        </div>
-
-        <div class="main-content">
-            <div class="inventory-section">
-                <h2 class="section-title">Minibar Položky</h2>
-                <div class="category-tabs">
-                    <button class="category-tab active" data-category="all">Vše</button>
-                    <button class="category-tab" data-category="non-alcoholic">Nealko</button>
-                    <button class="category-tab" data-category="alcoholic">Alkoholické</button>
-                    <button class="category-tab" data-category="beer">Pivo</button>
-                    <button class="category-tab" data-category="relax">Relax</button>
-                </div>
-                <div id="inventory" class="inventory">
-                    <!-- Items will be dynamically loaded here -->
-                </div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>SPRÁVA MINIBARU</h1>
+            
+            <div class="sidebar-section">
+                <h2>Vily</h2>
+                <a class="villa-btn oh-yeah" onclick="selectVilla('oh-yeah')">Oh Yeah Villa</a>
+                <a class="villa-btn amazing-pool" onclick="selectVilla('amazing-pool')">Amazing Pool Villa</a>
+                <a class="villa-btn little-castle" onclick="selectVilla('little-castle')">Little Castle Villa</a>
             </div>
-
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3 class="section-title">Nastavení</h3>
-                    <div class="form-control">
+            
+            <div class="sidebar-section">
+                <h2>Minibar Položky</h2>
+                <a class="category-btn" onclick="filterItems('all')">Vše</a>
+                <a class="category-btn" onclick="filterItems('non-alcoholic')">Nealko</a>
+                <a class="category-btn" onclick="filterItems('alcoholic')">Alkoholické</a>
+                <a class="category-btn" onclick="filterItems('beer')">Pivo</a>
+                <a class="category-btn" onclick="filterItems('relax')">Relax</a>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Inventory section -->
+            <div class="inventory" id="inventory">
+                <!-- Items will be dynamically added here -->
+            </div>
+            
+            <!-- Settings section -->
+            <div class="settings">
+                <div class="settings-grid">
+                    <div class="settings-column">
                         <label for="guests">Počet hostů:</label>
                         <input type="number" id="guests" min="1" value="1" onchange="updateStats()">
-                    </div>
-                    <div class="form-control">
+                        
                         <label for="nights">Počet nocí:</label>
                         <input type="number" id="nights" min="1" value="1" onchange="updateStats()">
                     </div>
-                    <div class="form-control">
+                    
+                    <div class="settings-column">
                         <label for="currency">Měna:</label>
                         <select id="currency" onchange="updateStats()">
                             <option value="CZK">CZK</option>
                             <option value="EUR">EUR</option>
                         </select>
-                    </div>
-                    <div class="form-control">
+                        
                         <label for="paymentMethod">Způsob platby:</label>
                         <select id="paymentMethod">
                             <option value="cash">Hotově</option>
@@ -589,138 +510,117 @@
                             <option value="unpaid">Neplaceno</option>
                         </select>
                     </div>
-                    <div class="form-control">
-                        <label for="discount">
-                            <input type="checkbox" id="discount" onchange="updateStats()"> Sleva 10%
-                        </label>
-                    </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <h3 class="section-title">Přehled</h3>
-                    <div class="form-control">
-                        <label>Počet položek: <span id="totalItems">0</span></label>
-                    </div>
-                    <div class="form-control">
-                        <label>Celková částka: <span id="totalAmount">0 CZK</span></label>
-                    </div>
-                    <div class="form-control">
-                        <button class="cart-button" onclick="toggleCart()">
-                            <i class="fas fa-shopping-cart"></i> Košík
-                            <span id="cartCount" class="cart-count">0</span>
-                        </button>
-                    </div>
-                    <div class="form-control">
-                        <button class="cart-button" onclick="updateExchangeRate()">
-                            <i class="fas fa-sync-alt"></i> Změnit kurz EUR/CZK
-                        </button>
+                    
+                    <div class="settings-column">
+                        <div class="discount-check">
+                            <input type="checkbox" id="discount" onchange="updateStats()">
+                            <label for="discount">Sleva 10%</label>
+                        </div>
+                        
+                        <div class="stats">
+                            <h3>Přehled</h3>
+                            <p>Počet položek: <span id="totalItems">0</span></p>
+                            <p>Celková částka: <span id="totalAmount">0 CZK</span></p>
+                        </div>
+                        
+                        <button class="invoice-btn" onclick="generateInvoice()">Vytvořit fakturu</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Cart Panel -->
-    <div id="cartPanel" class="cart-panel">
-        <div class="cart-header">
-            <h2>Košík</h2>
-            <button class="cart-close" onclick="toggleCart()"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="cartItems" class="cart-items">
-            <!-- Cart items will be loaded here -->
-        </div>
-        <div class="cart-footer">
-            <button class="invoice-btn" onclick="generateInvoice()">Vytvořit fakturu</button>
-        </div>
-    </div>
-
-    <!-- Quantity Selector -->
-    <div id="quantitySelector" class="quantity-selector">
+    
+    <!-- Quantity selector -->
+    <div class="quantity-selector" id="quantitySelector">
         <div class="quantity-selector-content">
-            <h3 class="quantity-title">Vyberte množství</h3>
-            <p id="selectedItemName" class="quantity-title">Položka</p>
-            <p id="selectedItemPrice" class="quantity-price">Cena</p>
+            <h3 id="selectedItemName">Položka</h3>
+            <p id="selectedItemPrice">0 CZK</p>
+            
             <div class="quantity-controls">
                 <button class="quantity-btn" onclick="adjustQuantity(-1)">-</button>
-                <div id="quantityDisplay" class="quantity-display">1</div>
+                <div class="quantity-display" id="quantityDisplay">1</div>
                 <button class="quantity-btn" onclick="adjustQuantity(1)">+</button>
             </div>
-            <div class="quantity-actions">
+            
+            <div class="quantity-selector-buttons">
                 <button class="cancel-btn" onclick="hideQuantitySelector()">Zrušit</button>
                 <button class="confirm-btn" onclick="confirmQuantity()">Potvrdit</button>
             </div>
         </div>
     </div>
-
-    <!-- Invoice Modal -->
-    <div id="invoiceModal" class="invoice-modal">
-        <div id="invoiceContent" class="invoice-content">
-            <!-- Invoice content will be generated here -->
+    
+    <!-- Cart toggle button -->
+    <div class="cart-toggle" onclick="toggleCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <div class="cart-badge" id="cartCount">0</div>
+    </div>
+    
+    <!-- Cart panel -->
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            <h2>Košík</h2>
+            <button class="cart-close" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Cart items will be dynamically added here -->
+        </div>
+        <div class="cart-footer">
+            <button class="invoice-btn" style="width: 100%; margin: 0;" onclick="updateExchangeRate()">
+                Změnit kurz EUR/CZK
+            </button>
         </div>
     </div>
-
+    
+    <!-- Invoice modal -->
+    <div class="invoice-modal" id="invoiceModal">
+        <div class="invoice-content" id="invoiceContent">
+            <!-- Invoice content will be dynamically added here -->
+        </div>
+    </div>
+    
     <!-- Scripts -->
     <script src="inventory.js"></script>
     <script src="app.js"></script>
     <script>
-        // Upravená funkce pro render inventáře podle kategorií
+        // Additional function to render inventory items
         function renderInventory() {
-            const inventoryEl = document.getElementById('inventory');
-            inventoryEl.innerHTML = '';
+            const invEl = document.getElementById('inventory');
+            invEl.innerHTML = '';
             
-            const activeCategory = document.querySelector('.category-tab.active').dataset.category;
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const activeCategory = Array.from(categoryButtons).find(btn => btn.classList.contains('active'));
+            const categoryFilter = activeCategory ? activeCategory.getAttribute('data-category') : 'all';
             
             inventory[currentVilla].forEach(item => {
-                // Přeskočit prázdnou položku
-                if (!item.name) return;
-                
-                // Filtrovat podle aktivní kategorie
-                if (activeCategory !== 'all' && item.category !== activeCategory) return;
-                
-                const itemEl = document.createElement('div');
-                itemEl.className = `item ${currentVilla}`;
-                
-                // Použít obrázek pokud existuje, jinak ikonu
-                let imageHtml = '';
-                if (item.image && item.image !== '') {
-                    // Kontrola zda obrázek existuje - pokud ne, použij ikonu
-                    imageHtml = `<img src="${item.image}" alt="${item.name}" class="item-image" onerror="this.onerror=null;this.style.display='none';this.parentNode.innerHTML += '<i class=\\'fas fa-${item.icon || 'glass-martini'}\\'></i>';">`;
-                } else if (item.icon) {
-                    imageHtml = `<i class="fas ${item.icon} item-icon"></i>`;
-                } else {
-                    // Výchozí ikona podle kategorie
-                    let defaultIcon = 'glass-martini';
-                    if (item.category === 'non-alcoholic') defaultIcon = 'bottle-water';
-                    else if (item.category === 'beer') defaultIcon = 'beer';
-                    else if (item.category === 'relax') defaultIcon = 'spa';
-                    
-                    imageHtml = `<i class="fas fa-${defaultIcon} item-icon"></i>`;
+                if (item.name && (categoryFilter === 'all' || item.category === categoryFilter)) {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'item';
+                    itemEl.innerHTML = `
+                        <img src="${item.image || 'images/placeholder.png'}" alt="${item.name}">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">${item.price} ${item.currency}</div>
+                    `;
+                    itemEl.onclick = () => handleItemClick(item);
+                    invEl.appendChild(itemEl);
                 }
-                
-                itemEl.innerHTML = `
-                    ${imageHtml}
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-price">${item.customPrice ? 'Vlastní cena' : `${item.price} ${item.currency}`}</div>
-                `;
-                itemEl.onclick = () => handleItemClick(item);
-                inventoryEl.appendChild(itemEl);
             });
         }
         
-        // Přidat event listener pro kategorie
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                renderInventory();
-            });
-        });
+        // Function to filter items by category
+        function filterItems(category) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.category-btn[data-category="${category}"]`).classList.add('active');
+            renderInventory();
+        }
         
-        // Event Listeners pro inicializaci
+        // Add category attributes to category buttons
         document.addEventListener('DOMContentLoaded', () => {
-            selectVilla('oh-yeah');
-            updateStats();
-            document.querySelector('.category-tab').classList.add('active');
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const categories = ['all', 'non-alcoholic', 'alcoholic', 'beer', 'relax'];
+            
+            categoryButtons.forEach((btn, index) => {
+                btn.setAttribute('data-category', categories[index]);
+            });
         });
     </script>
 </body>
