@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Správa Minibaru</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        :root {
+:root {
             --oh-yeah-color: #c03546;
             --amazing-pool-color: #3573b5;
             --little-castle-color: #6a3d99;
